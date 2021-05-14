@@ -5,14 +5,6 @@ import (
 	"math"
 )
 
-func buildUnvisitedNodesMap(nodes NodesMap) NodesMap {
-	unvisited := NodesMap{}
-	for key, value := range nodes {
-		unvisited[key] = value
-	}
-	return unvisited
-}
-
 type Node struct {
 	ID                string
 	visited           bool
@@ -69,22 +61,16 @@ func buildEdgesMapFromSlice(edges []*Edge) EdgesMap {
 	return edgesMap
 }
 
-func Dijkstra(edges []*Edge) []*Edge {
-	fmt.Printf("Dijkstra starting total edges=%d\n", len(edges))
+func Dijkstra(edges []*Edge) NodesMap {
 	initial, unvisited := buildUnvisitedNodesMapFromEdges(edges)
 	edgesMap := buildEdgesMapFromSlice(edges)
 	initial.tentativeDistance = 0
-	traverse(initial, unvisited, edgesMap)
 
-	// TODO build shortest path
+	path := NodesMap{initial.ID: initial}
 
-	for _, edge := range edges {
-		fmt.Printf("node=%s tentative=%f\n", edge.nodeA.ID, edge.nodeA.tentativeDistance)
-		fmt.Printf("node=%s tentative=%f\n", edge.nodeB.ID, edge.nodeB.tentativeDistance)
-		fmt.Printf("node=%s node=%s distance=%f\n", edge.nodeA.ID, edge.nodeB.ID, edge.distance)
-	}
+	traverse(initial, unvisited, edgesMap, path)
 
-	return []*Edge{}
+	return path
 }
 
 // Let the node at which we are starting be called the initial node. Let the distance of node Y be the distance from the initial node to Y.
@@ -112,20 +98,6 @@ func Dijkstra(edges []*Edge) []*Edge {
 type NodesMap map[string]*Node
 type EdgesMap map[string]*Edge
 
-func findNextNode(unvisited NodesMap) *Node {
-	var smallestTentativeDistance *Node
-	for _, node := range unvisited {
-		if smallestTentativeDistance == nil {
-			smallestTentativeDistance = node
-		} else {
-			if node.tentativeDistance < smallestTentativeDistance.tentativeDistance {
-				smallestTentativeDistance = node
-			}
-		}
-	}
-	return smallestTentativeDistance
-}
-
 func findPossibleNeighborNodes(currentNode *Node, edges EdgesMap) NodesMap {
 	possibleNeighbors := NodesMap{}
 
@@ -145,19 +117,24 @@ func findPossibleNeighborNodes(currentNode *Node, edges EdgesMap) NodesMap {
 // For example, if the current node A is marked with a distance of 6, and the edge connecting it with a neighbour B has length 2,
 // then the distance to B through A will be 6 + 2 = 8. If B was previously marked with a distance greater than 8 then change it to 8.
 // Otherwise, the current value will be kept.
-func traverse(currentNode *Node, unvisitedNodes NodesMap, edges EdgesMap) {
+func traverse(currentNode *Node, unvisitedNodes NodesMap, edges EdgesMap, path NodesMap) {
 
 	possibleNeighbors := findPossibleNeighborNodes(currentNode, edges)
+
+	actualNeighbors := []*Node{}
 
 	for _, possibleNeighbor := range possibleNeighbors {
 		if !possibleNeighbor.visited {
 			edgeKey := buildEdgeKeyFromNodes(currentNode, possibleNeighbor)
 			edge, edgeOk := edges[edgeKey]
 			if edgeOk {
+
+				// this is an actual neighbor node
+				actualNeighbors = append(actualNeighbors, possibleNeighbor)
+
 				d := currentNode.tentativeDistance + edge.distance
-				fmt.Println("edge OK ", possibleNeighbor.tentativeDistance, d)
+
 				if possibleNeighbor.tentativeDistance > d {
-					fmt.Println("setting tentative distance ", d)
 					possibleNeighbor.tentativeDistance = d
 				}
 			}
@@ -167,7 +144,6 @@ func traverse(currentNode *Node, unvisitedNodes NodesMap, edges EdgesMap) {
 	currentNode.visited = true
 
 	if currentNode.isDestination {
-		fmt.Println("destination node reached")
 		return
 	}
 
@@ -177,9 +153,24 @@ func traverse(currentNode *Node, unvisitedNodes NodesMap, edges EdgesMap) {
 		return
 	}
 
-	nextNode := findNextNode(unvisitedNodes)
+	var nextNode *Node
+	for _, node := range actualNeighbors {
+		if nextNode == nil {
+			nextNode = node
+		} else if node.tentativeDistance < nextNode.tentativeDistance {
+			nextNode = node
+		}
+	}
+
+	if nextNode == nil {
+		fmt.Println("no next node found")
+		return
+	}
+
+	path[nextNode.ID] = nextNode
+
 	if nextNode != nil {
-		traverse(nextNode, unvisitedNodes, edges)
+		traverse(nextNode, unvisitedNodes, edges, path)
 	}
 
 }

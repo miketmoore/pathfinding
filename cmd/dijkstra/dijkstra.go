@@ -47,5 +47,11 @@ func main() {
 	}
 
 	shortestPath := pathfinding.Dijkstra(edges)
-	fmt.Println(shortestPath)
+	// fmt.Println(shortestPath)
+
+	nodeIndex := 0
+	for nodeId := range shortestPath {
+		fmt.Printf("index=%d id=%s\n", nodeIndex, nodeId)
+		nodeIndex++
+	}
 }
