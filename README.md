@@ -1,7 +1,5 @@
 # pathfinding
 
-* https://en.wikipedia.org/wiki/Pathfinding
-
 ### Run tests
 
 ```
