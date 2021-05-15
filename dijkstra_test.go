@@ -58,6 +58,14 @@ func TestDijkstra(t *testing.T) {
 		shortestPath[1].ID != "b" ||
 		shortestPath[2].ID != "d" ||
 		shortestPath[3].ID != "f" {
-		t.Errorf("path is invalid")
+		t.Errorf("path is invalid [%s]", pathToString(shortestPath))
 	}
+}
+
+func pathToString(path []*pathfinding.Node) string {
+	s := ""
+	for _, node := range path {
+		s = fmt.Sprintf("%s %s", s, node.ID)
+	}
+	return s
 }
