@@ -6,10 +6,9 @@ import (
 )
 
 type Node struct {
-	ID                string
-	visited           bool
-	tentativeDistance float64
-	isDestination     bool
+	ID                               string
+	tentativeDistance                float64
+	visited, isSource, isDestination bool
 }
 
 func NewNode(id string) *Node {
@@ -17,8 +16,15 @@ func NewNode(id string) *Node {
 		ID:                id,
 		visited:           false,
 		tentativeDistance: math.Inf(1),
+		isSource:          false,
 		isDestination:     false,
 	}
+}
+
+func NewSourceNode(id string) *Node {
+	node := NewNode(id)
+	node.isSource = true
+	return node
 }
 
 func NewDestinationNode(id string) *Node {
@@ -44,7 +50,11 @@ func buildUnvisitedNodesMapFromEdges(edges []*Edge) (initial *Node, nodesMap Nod
 	unvisited := NodesMap{}
 	for _, edge := range edges {
 		if initial == nil {
-			initial = edge.nodeA
+			if edge.nodeA.isSource {
+				initial = edge.nodeA
+			} else if edge.nodeB.isSource {
+				initial = edge.nodeB
+			}
 		}
 		unvisited[edge.nodeA.ID] = edge.nodeA
 		unvisited[edge.nodeB.ID] = edge.nodeB
@@ -61,16 +71,19 @@ func buildEdgesMapFromSlice(edges []*Edge) EdgesMap {
 	return edgesMap
 }
 
-func Dijkstra(edges []*Edge) NodesMap {
+func Dijkstra(edges []*Edge) ([]*Node, error) {
 	initial, unvisited := buildUnvisitedNodesMapFromEdges(edges)
+	if initial == nil {
+		return []*Node{}, fmt.Errorf("no node was marked as source")
+	}
 	edgesMap := buildEdgesMapFromSlice(edges)
 	initial.tentativeDistance = 0
 
-	path := NodesMap{initial.ID: initial}
+	shortestPath := []*Node{initial}
 
-	traverse(initial, unvisited, edgesMap, path)
+	traverse(initial, unvisited, edgesMap, &shortestPath)
 
-	return path
+	return shortestPath, nil
 }
 
 // Let the node at which we are starting be called the initial node. Let the distance of node Y be the distance from the initial node to Y.
@@ -117,7 +130,7 @@ func findPossibleNeighborNodes(currentNode *Node, edges EdgesMap) NodesMap {
 // For example, if the current node A is marked with a distance of 6, and the edge connecting it with a neighbour B has length 2,
 // then the distance to B through A will be 6 + 2 = 8. If B was previously marked with a distance greater than 8 then change it to 8.
 // Otherwise, the current value will be kept.
-func traverse(currentNode *Node, unvisitedNodes NodesMap, edges EdgesMap, path NodesMap) {
+func traverse(currentNode *Node, unvisitedNodes NodesMap, edges EdgesMap, shortestPath *[]*Node) {
 
 	possibleNeighbors := findPossibleNeighborNodes(currentNode, edges)
 
@@ -167,10 +180,10 @@ func traverse(currentNode *Node, unvisitedNodes NodesMap, edges EdgesMap, path N
 		return
 	}
 
-	path[nextNode.ID] = nextNode
+	*shortestPath = append(*shortestPath, nextNode)
 
 	if nextNode != nil {
-		traverse(nextNode, unvisitedNodes, edges, path)
+		traverse(nextNode, unvisitedNodes, edges, shortestPath)
 	}
 
 }

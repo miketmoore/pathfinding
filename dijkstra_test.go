@@ -1,13 +1,13 @@
-package main
+package pathfinding_test
 
 import (
 	"fmt"
-	"os"
+	"testing"
 
 	"github.com/miketmoore/pathfinding"
 )
 
-func main() {
+func TestDijkstra(t *testing.T) {
 
 	nodeA := pathfinding.NewSourceNode("a")
 	nodeB := pathfinding.NewNode("b")
@@ -35,9 +35,6 @@ func main() {
 	//  | /
 	// [F]
 
-	// shortest path is A > B > D > F (distance=9)
-	// longest path is A > C > E > F (distance=10)
-
 	edges := []*pathfinding.Edge{
 		pathfinding.NewEdge(nodeA, nodeB, 1),
 		pathfinding.NewEdge(nodeA, nodeC, 2),
@@ -50,11 +47,17 @@ func main() {
 	shortestPath, err := pathfinding.Dijkstra(edges)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(0)
+		t.Errorf("error is unexpected")
 	}
 
-	for nodeIndex, node := range shortestPath {
-		fmt.Printf("index=%d id=%s\n", nodeIndex, node.ID)
-		nodeIndex++
+	if len(shortestPath) != 4 {
+		t.Errorf("path length is unexpected: [%d]", len(shortestPath))
+	}
+
+	if shortestPath[0].ID != "a" ||
+		shortestPath[1].ID != "b" ||
+		shortestPath[2].ID != "d" ||
+		shortestPath[3].ID != "f" {
+		t.Errorf("path is invalid")
 	}
 }
