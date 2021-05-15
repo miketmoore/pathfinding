@@ -2,6 +2,18 @@
 
 * https://en.wikipedia.org/wiki/Pathfinding
 
+### Run tests
+
+```
+go test
+```
+
 ## Dijkstra's Algorithm
 
-* https://en.wikipedia.org/wiki/Dijkstra
+Find the shortest path in a graph
+
+### Run example
+
+```
+go cmd/dijkstra/dijkstra.go
+```
