@@ -125,11 +125,6 @@ func findPossibleNeighborNodes(currentNode *Node, edges EdgesMap) NodesMap {
 	return possibleNeighbors
 }
 
-// For the current node, consider all of its unvisited neighbours and calculate their tentative distances through the current node.
-// Compare the newly calculated tentative distance to the current assigned value and assign the smaller one.
-// For example, if the current node A is marked with a distance of 6, and the edge connecting it with a neighbour B has length 2,
-// then the distance to B through A will be 6 + 2 = 8. If B was previously marked with a distance greater than 8 then change it to 8.
-// Otherwise, the current value will be kept.
 func traverse(currentNode *Node, unvisitedNodes NodesMap, edges EdgesMap, shortestPath *[]*Node) {
 
 	possibleNeighbors := findPossibleNeighborNodes(currentNode, edges)
@@ -217,70 +212,3 @@ func buildEdgeKeyFromNodes(nodeA, nodeB *Node) string {
 		nodeB.ID,
 	)
 }
-
-// func buildNodesAndEdges(grid *mazegen.Grid) (initialNode *Node, nodesMap NodesMap, edgesMap EdgesMap) {
-// 	nodesMap = NodesMap{}
-// 	edgesMap = EdgesMap{}
-
-// 	cacheNode := func(node *Node) {
-// 		key := buildNodeKey(node)
-// 		_, ok := nodesMap[key]
-// 		if !ok {
-// 			nodesMap[key] = node
-// 		}
-// 	}
-
-// 	cacheEdge := func(nodeA, nodeB *Node) {
-// 		cacheNode(nodeA)
-// 		cacheNode(nodeB)
-
-// 		edge := newEdge(nodeA, nodeB, 1)
-// 		// key := buildEdgeKey(edge)
-// 		key := buildEdgeKeyFromNodes(nodeA, nodeB)
-// 		_, ok := edgesMap[key]
-// 		if !ok {
-// 			edgesMap[key] = edge
-// 		}
-// 	}
-
-// 	for y, row := range grid.Cells {
-// 		for x, cell := range row {
-
-// 			thisNode := newNode(y, x)
-
-// 			if initialNode == nil {
-// 				initialNode = thisNode
-// 			}
-
-// 			// build edges
-// 			if cell.Walls[mazegen.North] {
-// 				// build edge from this to north node
-// 				if y > 0 {
-// 					cacheEdge(thisNode, newNode(y-1, x))
-// 				}
-// 			}
-// 			if cell.Walls[mazegen.East] {
-// 				// build edge from this node to east node
-// 				maxX := len(row) - 1
-// 				if x < maxX {
-// 					cacheEdge(thisNode, newNode(y, x+1))
-// 				}
-// 			}
-// 			if cell.Walls[mazegen.South] {
-// 				// build edge from this node to south node
-// 				maxY := grid.Rows
-// 				if y < maxY {
-// 					cacheEdge(thisNode, newNode(y+1, x))
-// 				}
-// 			}
-// 			if cell.Walls[mazegen.West] {
-// 				// build edge from this node to west node
-// 				if x > 0 {
-// 					cacheEdge(thisNode, newNode(y, x-1))
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	return initialNode, nodesMap, edgesMap
-// }
