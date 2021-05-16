@@ -158,25 +158,22 @@ func TestDijkstra(t *testing.T) {
 	for _, test := range tests {
 
 		graph := test.getGraph()
-		shortestPathSet, err := pathfinding.Dijkstra(graph)
+		shortestPathSet, shortestPath, err := pathfinding.Dijkstra(graph)
 		if err != nil {
 			fmt.Println(err)
 			t.Errorf("error is unexpected")
 		}
 
-		// gotLength := len(shortestPath)
-		// expectedLength := len(test.expected)
-
-		// if gotLength != expectedLength {
-		// 	t.Errorf("length is %d but is expected to be %d", gotLength, expectedLength)
-		// }
-
 		hasMatchingPath := false
 		for _, possiblePath := range test.expected {
-			if isMatch(shortestPathSet, possiblePath) {
-				hasMatchingPath = true
-				break
+			isMatch := false
+			for _, id := range possiblePath {
+				if id =
 			}
+			// if isMatch(shortestPathSet, possiblePath) {
+			// 	hasMatchingPath = true
+			// 	break
+			// }
 		}
 
 		if !hasMatchingPath {

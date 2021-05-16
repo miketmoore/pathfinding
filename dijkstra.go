@@ -7,7 +7,7 @@ import (
 
 type Node struct {
 	ID                               string
-	tentativeDistance                float64
+	TentativeDistance                float64
 	visited, isSource, isDestination bool
 }
 
@@ -15,7 +15,7 @@ func NewNode(id string) *Node {
 	return &Node{
 		ID:                id,
 		visited:           false,
-		tentativeDistance: math.Inf(1),
+		TentativeDistance: math.Inf(1),
 		isSource:          false,
 		isDestination:     false,
 	}
@@ -34,23 +34,23 @@ func NewDestinationNode(id string) *Node {
 }
 
 type Edge struct {
-	nodeA, nodeB *Node
-	distance     float64
+	NodeA, NodeB *Node
+	Distance     float64
 }
 
 func (e Edge) ID() string {
 	return fmt.Sprintf(
 		"%s~%s",
-		e.nodeA.ID,
-		e.nodeB.ID,
+		e.NodeA.ID,
+		e.NodeB.ID,
 	)
 }
 
 func NewEdge(nodeA, nodeB *Node, distance float64) *Edge {
 	return &Edge{
-		nodeA:    nodeA,
-		nodeB:    nodeB,
-		distance: distance,
+		NodeA:    nodeA,
+		NodeB:    nodeB,
+		Distance: distance,
 	}
 }
 
@@ -94,8 +94,8 @@ func (g *Graph) AddEdge(nodeA, nodeB *Node, distance float64) {
 
 func (g *Graph) FindEdge(u, v *Node) (*Edge, bool) {
 	for _, edge := range g.Edges {
-		if (edge.nodeA.ID == u.ID && edge.nodeB.ID == v.ID) ||
-			(edge.nodeA.ID == v.ID && edge.nodeB.ID == u.ID) {
+		if (edge.NodeA.ID == u.ID && edge.NodeB.ID == v.ID) ||
+			(edge.NodeA.ID == v.ID && edge.NodeB.ID == u.ID) {
 			return edge, true
 		}
 	}
@@ -106,7 +106,7 @@ func (g *Graph) FindEdgesForNode(node *Node) EdgesMap {
 	edgesMap := EdgesMap{}
 
 	for edgeId, edge := range g.Edges {
-		if edge.nodeA.ID == node.ID || edge.nodeB.ID == node.ID {
+		if edge.NodeA.ID == node.ID || edge.NodeB.ID == node.ID {
 			edgesMap[edgeId] = edge
 		}
 	}
@@ -130,7 +130,25 @@ func (g *Graph) FindEdgesForNodes(nodesMap NodesMap) EdgesMap {
 	return edgesMap
 }
 
-func Dijkstra(graph *Graph) (shortestPathSet NodesMap, err error) {
+func (g *Graph) GraphVizString() string {
+	gvStr := "graph shortestPath {\n"
+	for _, edge := range g.Edges {
+		gvStr = fmt.Sprintf("%s  %s -- %s [label=%.2f]\n", gvStr, edge.NodeA.ID, edge.NodeB.ID, edge.Distance)
+	}
+
+	for _, node := range g.Nodes {
+		if node.isSource {
+			gvStr = fmt.Sprintf("%s  %s [shape=diamond];\n", gvStr, node.ID)
+		} else if node.isDestination {
+			gvStr = fmt.Sprintf("%s  %s [shape=square];\n", gvStr, node.ID)
+		}
+	}
+
+	gvStr = fmt.Sprintf("%s}", gvStr)
+	return gvStr
+}
+
+func Dijkstra(graph *Graph) (shortestPathSet NodesMap, parent []*Node, err error) {
 
 	// 1) Create a set sptSet (shortest path tree set) that keeps track of vertices included in shortest path tree, i.e.,
 	// whose minimum distance from source is calculated and finalized. Initially, this set is empty.
@@ -167,14 +185,16 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, err error) {
 	findAdjacentNodes := func(node *Node) []*Node {
 		adjacent := []*Node{}
 		for _, edge := range graph.Edges {
-			if node.ID == edge.nodeA.ID {
-				adjacent = append(adjacent, edge.nodeB)
-			} else if node.ID == edge.nodeB.ID {
-				adjacent = append(adjacent, edge.nodeA)
+			if node.ID == edge.NodeA.ID {
+				adjacent = append(adjacent, edge.NodeB)
+			} else if node.ID == edge.NodeB.ID {
+				adjacent = append(adjacent, edge.NodeA)
 			}
 		}
 		return adjacent
 	}
+
+	parent = []*Node{}
 
 	// While the shortest path set does not contain all nodes
 	for len(shortestPathSet) != len(graph.Nodes) {
@@ -182,7 +202,7 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, err error) {
 		u := findNodeNotInShortestPathSet(shortestPathSet, graph.Nodes)
 		if u == nil {
 			// TODO
-			return shortestPathSet, fmt.Errorf("node not found")
+			return shortestPathSet, parent, fmt.Errorf("node not found")
 		}
 		// Include u to sptSet.
 		shortestPathSet[u.ID] = u
@@ -195,29 +215,30 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, err error) {
 			edge, ok := graph.FindEdge(u, v)
 			if !ok {
 				// TODO
-				return shortestPathSet, fmt.Errorf("edge not found")
+				return shortestPathSet, parent, fmt.Errorf("edge not found")
 			}
-			d := edge.distance
+			d := edge.Distance
 
 			// For every adjacent vertex v, if sum of distance value of u (from source) and weight of edge u-v, is less than the distance value of v,
 			// then update the distance value of v.
 			// TODO
-			v.tentativeDistance = d
+			v.TentativeDistance = d
 		}
 
 		// Pick the vertex with minimum distance value and not already included in SPT (not in sptSET).
 		min := math.Inf(1)
 		var last *Node
 		for _, v := range adjacent {
-			if v.tentativeDistance < min {
+			if v.TentativeDistance < min {
 				last = v
 			}
 		}
 
 		if last == nil {
 			// TODO
-			return shortestPathSet, fmt.Errorf("last is nil")
+			return shortestPathSet, parent, fmt.Errorf("last is nil")
 		} else {
+			parent = append(parent, last)
 			shortestPathSet[last.ID] = last
 
 			// Update the distance values of adjacent vertices of last
@@ -227,7 +248,7 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, err error) {
 
 	}
 
-	return shortestPathSet, nil
+	return shortestPathSet, parent, nil
 
 }
 
