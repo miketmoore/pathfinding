@@ -38,6 +38,14 @@ type Edge struct {
 	distance     float64
 }
 
+func (e Edge) ID() string {
+	return fmt.Sprintf(
+		"%s~%s",
+		e.nodeA.ID,
+		e.nodeB.ID,
+	)
+}
+
 func NewEdge(nodeA, nodeB *Node, distance float64) *Edge {
 	return &Edge{
 		nodeA:    nodeA,
@@ -46,169 +54,182 @@ func NewEdge(nodeA, nodeB *Node, distance float64) *Edge {
 	}
 }
 
-func buildUnvisitedNodesMapFromEdges(edges []*Edge) (initial *Node, nodesMap NodesMap) {
-	unvisited := NodesMap{}
-	for _, edge := range edges {
-		if initial == nil {
-			if edge.nodeA.isSource {
-				initial = edge.nodeA
-			} else if edge.nodeB.isSource {
-				initial = edge.nodeB
-			}
-		}
-		unvisited[edge.nodeA.ID] = edge.nodeA
-		unvisited[edge.nodeB.ID] = edge.nodeB
-	}
-	return initial, unvisited
+// func buildEdgesMapFromSlice(edges []*Edge) EdgesMap {
+// 	edgesMap := EdgesMap{}
+// 	for _, edge := range edges {
+// 		edgeKey := buildEdgeKeyFromNodes(edge.nodeA, edge.nodeB)
+// 		edgesMap[edgeKey] = edge
+// 	}
+// 	return edgesMap
+// }
+
+type Graph struct {
+	Nodes NodesMap
+	Edges EdgesMap
 }
 
-func buildEdgesMapFromSlice(edges []*Edge) EdgesMap {
-	edgesMap := EdgesMap{}
-	for _, edge := range edges {
-		edgeKey := buildEdgeKeyFromNodes(edge.nodeA, edge.nodeB)
-		edgesMap[edgeKey] = edge
+func NewGraph() *Graph {
+	return &Graph{
+		Nodes: NodesMap{},
+		Edges: EdgesMap{},
 	}
+}
+
+func (g *Graph) AddNode(node *Node) {
+	_, ok := g.Nodes[node.ID]
+	if !ok {
+		g.Nodes[node.ID] = node
+	}
+}
+
+func (g *Graph) AddEdge(nodeA, nodeB *Node, distance float64) {
+	g.AddNode(nodeA)
+	g.AddNode(nodeB)
+	edge := NewEdge(nodeA, nodeB, distance)
+	_, ok := g.Edges[edge.ID()]
+	if !ok {
+		g.Edges[edge.ID()] = edge
+	}
+}
+
+func (g *Graph) FindEdge(u, v *Node) (*Edge, bool) {
+	for _, edge := range g.Edges {
+		if (edge.nodeA.ID == u.ID && edge.nodeB.ID == v.ID) ||
+			(edge.nodeA.ID == v.ID && edge.nodeB.ID == u.ID) {
+			return edge, true
+		}
+	}
+	return nil, false
+}
+
+func (g *Graph) FindEdgesForNode(node *Node) EdgesMap {
+	edgesMap := EdgesMap{}
+
+	for edgeId, edge := range g.Edges {
+		if edge.nodeA.ID == node.ID || edge.nodeB.ID == node.ID {
+			edgesMap[edgeId] = edge
+		}
+	}
+
 	return edgesMap
 }
 
-func Dijkstra(edges []*Edge) ([]*Node, error) {
-	initial, unvisited := buildUnvisitedNodesMapFromEdges(edges)
-	if initial == nil {
-		return []*Node{}, fmt.Errorf("no node was marked as source")
-	}
-	edgesMap := buildEdgesMapFromSlice(edges)
-	initial.tentativeDistance = 0
+func (g *Graph) FindEdgesForNodes(nodesMap NodesMap) EdgesMap {
+	edgesMap := EdgesMap{}
 
-	shortestPath := []*Node{initial}
-
-	traverse(initial, unvisited, edgesMap, &shortestPath)
-
-	return shortestPath, nil
-}
-
-// Let the node at which we are starting be called the initial node. Let the distance of node Y be the distance from the initial node to Y.
-// Dijkstra's algorithm will assign some initial distance values and will try to improve them step by step.
-
-// Mark all nodes unvisited. Create a set of all the unvisited nodes called the unvisited set.
-// Assign to every node a tentative distance value: set it to zero for our initial node and to infinity for all other nodes. Set the initial node as current.[15]
-
-// For the current node, consider all of its unvisited neighbours and calculate their tentative distances through the current node.
-// Compare the newly calculated tentative distance to the current assigned value and assign the smaller one.
-// For example, if the current node A is marked with a distance of 6, and the edge connecting it with a neighbour B has length 2,
-// then the distance to B through A will be 6 + 2 = 8. If B was previously marked with a distance greater than 8 then change it to 8.
-// Otherwise, the current value will be kept.
-
-// When we are done considering all of the unvisited neighbours of the current node, mark the current node as visited and remove it from the unvisited set.
-// A visited node will never be checked again.
-
-// If the destination node has been marked visited (when planning a route between two specific nodes) or if the smallest tentative distance among the nodes
-// in the unvisited set is infinity (when planning a complete traversal; occurs when there is no connection between the initial node and remaining unvisited nodes), then stop.
-// The algorithm has finished.
-
-// Otherwise, select the unvisited node that is marked with the smallest tentative distance, set it as the new "current node", and go back to step 3.
-// When planning a route, it is actually not necessary to wait until the destination node is "visited" as above: the algorithm can stop once the destination node has the smallest tentative distance among all "unvisited" nodes (and thus could be selected as the next "current").
-
-type NodesMap map[string]*Node
-type EdgesMap map[string]*Edge
-
-func findPossibleNeighborNodes(currentNode *Node, edges EdgesMap) NodesMap {
-	possibleNeighbors := NodesMap{}
-
-	for _, edge := range edges {
-		if edge.nodeA == currentNode {
-			possibleNeighbors[edge.nodeB.ID] = edge.nodeB
-		} else if edge.nodeB == currentNode {
-			possibleNeighbors[edge.nodeA.ID] = edge.nodeA
-		}
-	}
-
-	return possibleNeighbors
-}
-
-func traverse(currentNode *Node, unvisitedNodes NodesMap, edges EdgesMap, shortestPath *[]*Node) {
-
-	possibleNeighbors := findPossibleNeighborNodes(currentNode, edges)
-
-	actualNeighbors := []*Node{}
-
-	for _, possibleNeighbor := range possibleNeighbors {
-		if !possibleNeighbor.visited {
-			edgeKey := buildEdgeKeyFromNodes(currentNode, possibleNeighbor)
-			edge, edgeOk := edges[edgeKey]
-			if edgeOk {
-
-				// this is an actual neighbor node
-				actualNeighbors = append(actualNeighbors, possibleNeighbor)
-
-				d := currentNode.tentativeDistance + edge.distance
-
-				if possibleNeighbor.tentativeDistance > d {
-					possibleNeighbor.tentativeDistance = d
-				}
+	for _, node := range nodesMap {
+		edges := g.FindEdgesForNode(node)
+		for edgeId, edge := range edges {
+			_, ok := edgesMap[edgeId]
+			if !ok {
+				edgesMap[edgeId] = edge
 			}
 		}
 	}
 
-	currentNode.visited = true
+	return edgesMap
+}
 
-	if currentNode.isDestination {
-		return
-	}
+func Dijkstra(graph *Graph) (shortestPathSet NodesMap, err error) {
 
-	delete(unvisitedNodes, currentNode.ID)
+	// 1) Create a set sptSet (shortest path tree set) that keeps track of vertices included in shortest path tree, i.e.,
+	// whose minimum distance from source is calculated and finalized. Initially, this set is empty.
 
-	if isFinishEarlyCase(unvisitedNodes) {
-		return
-	}
+	// Shortest path tree set
+	// Keys are node IDs
+	// Values are nodes
+	// These nodes have a minimum distance from the source that is calculated and finalized
+	shortestPathSet = NodesMap{}
 
-	var nextNode *Node
-	for _, node := range actualNeighbors {
-		if nextNode == nil {
-			nextNode = node
-		} else if node.tentativeDistance < nextNode.tentativeDistance {
-			nextNode = node
+	// 2) Assign a distance value to all vertices in the input graph. Initialize all distance values as INFINITE.
+	// Assign distance value as 0 for the source vertex so that it is picked first.
+
+	// This is already done during instantiation of each Node
+
+	// 	3) While sptSet doesn’t include all vertices
+	// ….a) Pick a vertex u which is not there in sptSet and has minimum distance value.
+	// ….b) Include u to sptSet.
+	// ….c) Update distance value of all adjacent vertices of u. To update the distance values, iterate through all adjacent vertices.
+	// For every adjacent vertex v, if sum of distance value of u (from source) and weight of edge u-v, is less than the distance value of v,
+	// then update the distance value of v.
+
+	findNodeNotInShortestPathSet := func(shortestPathSet NodesMap, allNodes NodesMap) *Node {
+
+		for nodeId, node := range allNodes {
+			_, ok := shortestPathSet[nodeId]
+			if !ok {
+				return node
+			}
 		}
+		return nil
 	}
 
-	if nextNode == nil {
-		fmt.Println("no next node found")
-		return
+	findAdjacentNodes := func(node *Node) []*Node {
+		adjacent := []*Node{}
+		for _, edge := range graph.Edges {
+			if node.ID == edge.nodeA.ID {
+				adjacent = append(adjacent, edge.nodeB)
+			} else if node.ID == edge.nodeB.ID {
+				adjacent = append(adjacent, edge.nodeA)
+			}
+		}
+		return adjacent
 	}
 
-	*shortestPath = append(*shortestPath, nextNode)
+	// While the shortest path set does not contain all nodes
+	for len(shortestPathSet) != len(graph.Nodes) {
+		// Pick a vertex u which is not there in sptSet and has minimum distance value.
+		u := findNodeNotInShortestPathSet(shortestPathSet, graph.Nodes)
+		if u == nil {
+			// TODO
+			return shortestPathSet, fmt.Errorf("node not found")
+		}
+		// Include u to sptSet.
+		shortestPathSet[u.ID] = u
 
-	if nextNode != nil {
-		traverse(nextNode, unvisitedNodes, edges, shortestPath)
+		// Update distance value of all adjacent vertices of u. To update the distance values, iterate through all adjacent vertices.
+		adjacent := findAdjacentNodes(u)
+		for _, v := range adjacent {
+			// TODO update distance
+			// get distance from edge between u and v
+			edge, ok := graph.FindEdge(u, v)
+			if !ok {
+				// TODO
+				return shortestPathSet, fmt.Errorf("edge not found")
+			}
+			d := edge.distance
+
+			// For every adjacent vertex v, if sum of distance value of u (from source) and weight of edge u-v, is less than the distance value of v,
+			// then update the distance value of v.
+			// TODO
+			v.tentativeDistance = d
+		}
+
+		// Pick the vertex with minimum distance value and not already included in SPT (not in sptSET).
+		min := math.Inf(1)
+		var last *Node
+		for _, v := range adjacent {
+			if v.tentativeDistance < min {
+				last = v
+			}
+		}
+
+		if last == nil {
+			// TODO
+			return shortestPathSet, fmt.Errorf("last is nil")
+		} else {
+			shortestPathSet[last.ID] = last
+
+			// Update the distance values of adjacent vertices of last
+			// TODO ... just continue loop
+
+		}
+
 	}
+
+	return shortestPathSet, nil
 
 }
 
-func isFinishEarlyCase(unvisitedNodes NodesMap) bool {
-	// is destination node in unvisitedNodes?
-	// does it have the smallest tentative distance?
-	// if true for both, we are finished
-	smallestTentativeDistance := math.Inf(1)
-	var destinationNode *Node
-	for _, node := range unvisitedNodes {
-		if node.tentativeDistance < smallestTentativeDistance {
-			smallestTentativeDistance = node.tentativeDistance
-		}
-		if node.isDestination {
-			destinationNode = node
-		}
-	}
-	if destinationNode != nil && destinationNode.tentativeDistance < smallestTentativeDistance {
-		fmt.Println("destination node is unvisited and has the smallest tentative distance among all unvisited nodes, so we can return early")
-		return true
-	}
-
-	return false
-}
-
-func buildEdgeKeyFromNodes(nodeA, nodeB *Node) string {
-	return fmt.Sprintf(
-		"%s~%s",
-		nodeA.ID,
-		nodeB.ID,
-	)
-}
+type NodesMap map[string]*Node
+type EdgesMap map[string]*Edge
