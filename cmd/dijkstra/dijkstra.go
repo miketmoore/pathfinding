@@ -50,7 +50,7 @@ func main() {
 	graph.AddEdge(nodeD, nodeF, 6)
 	graph.AddEdge(nodeE, nodeF, 5)
 
-	shortestPathTree, parent, err := pathfinding.Dijkstra(graph)
+	shortestPathTree, shortestPath, err := pathfinding.Dijkstra(graph)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(0)
@@ -66,22 +66,11 @@ func main() {
 		fmt.Printf("id=%s  distance=%f\n", edgeId, edge.Distance)
 	}
 
-	fmt.Println("parent path ", parent)
-	for _, node := range parent {
+	fmt.Println("shortest path ", shortestPath)
+	for _, node := range shortestPath {
 		fmt.Printf("%s ", node.ID)
 	}
 	fmt.Println()
-
-	// graph ethane {
-	// 	C_0 -- H_0 [type=s];
-	// 	C_0 -- H_1 [type=s];
-	// 	C_0 -- H_2 [type=s];
-	// 	C_0 -- C_1 [type=s];
-	// 	C_1 -- H_3 [type=s];
-	// 	C_1 -- H_4 [type=s];
-	// 	C_1 -- H_5 [type=s];
-	// }
-
 	fmt.Println(graph.GraphVizString())
 
 }

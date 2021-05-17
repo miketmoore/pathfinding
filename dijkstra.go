@@ -64,8 +64,9 @@ func NewEdge(nodeA, nodeB *Node, distance float64) *Edge {
 // }
 
 type Graph struct {
-	Nodes NodesMap
-	Edges EdgesMap
+	Nodes      NodesMap
+	Edges      EdgesMap
+	IsDirected bool
 }
 
 func NewGraph() *Graph {
