@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>pathfinding: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/miketmoore/pathfinding/dijkstra.go (0.0%)</option>
+				
+				<option value="file1">github.com/miketmoore/pathfinding/graph.go (55.6%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package pathfinding
+
+import (
+        "fmt"
+        "math"
+)
+
+func Dijkstra(graph *Graph) (shortestPathSet NodesMap, parent []*Node, err error) <span class="cov0" title="0">{
+
+        // 1) Create a set sptSet (shortest path tree set) that keeps track of vertices included in shortest path tree, i.e.,
+        // whose minimum distance from source is calculated and finalized. Initially, this set is empty.
+
+        // Shortest path tree set
+        // Keys are node IDs
+        // Values are nodes
+        // These nodes have a minimum distance from the source that is calculated and finalized
+        shortestPathSet = NodesMap{}
+
+        // 2) Assign a distance value to all vertices in the input graph. Initialize all distance values as INFINITE.
+        // Assign distance value as 0 for the source vertex so that it is picked first.
+
+        // This is already done during instantiation of each Node
+
+        //         3) While sptSet doesn’t include all vertices
+        // ….a) Pick a vertex u which is not there in sptSet and has minimum distance value.
+        // ….b) Include u to sptSet.
+        // ….c) Update distance value of all adjacent vertices of u. To update the distance values, iterate through all adjacent vertices.
+        // For every adjacent vertex v, if sum of distance value of u (from source) and weight of edge u-v, is less than the distance value of v,
+        // then update the distance value of v.
+
+        findNodeNotInShortestPathSet := func(shortestPathSet NodesMap, allNodes NodesMap) *Node </span><span class="cov0" title="0">{
+
+                for nodeId, node := range allNodes </span><span class="cov0" title="0">{
+                        _, ok := shortestPathSet[nodeId]
+                        if !ok </span><span class="cov0" title="0">{
+                                return node
+                        }</span>
+                }
+                <span class="cov0" title="0">return nil</span>
+        }
+
+        <span class="cov0" title="0">findAdjacentNodes := func(node *Node) []*Node </span><span class="cov0" title="0">{
+                adjacent := []*Node{}
+                for _, edge := range graph.Edges </span><span class="cov0" title="0">{
+                        if node.ID == edge.NodeA.ID </span><span class="cov0" title="0">{
+                                adjacent = append(adjacent, edge.NodeB)
+                        }</span> else<span class="cov0" title="0"> if node.ID == edge.NodeB.ID </span><span class="cov0" title="0">{
+                                adjacent = append(adjacent, edge.NodeA)
+                        }</span>
+                }
+                <span class="cov0" title="0">return adjacent</span>
+        }
+
+        <span class="cov0" title="0">parent = []*Node{}
+
+        // While the shortest path set does not contain all nodes
+        for len(shortestPathSet) != len(graph.Nodes) </span><span class="cov0" title="0">{
+                // Pick a vertex u which is not there in sptSet and has minimum distance value.
+                u := findNodeNotInShortestPathSet(shortestPathSet, graph.Nodes)
+                if u == nil </span><span class="cov0" title="0">{
+                        // TODO
+                        return shortestPathSet, parent, fmt.Errorf("node not found")
+                }</span>
+                // Include u to sptSet.
+                <span class="cov0" title="0">shortestPathSet[u.ID] = u
+
+                // Update distance value of all adjacent vertices of u. To update the distance values, iterate through all adjacent vertices.
+                adjacent := findAdjacentNodes(u)
+                for _, v := range adjacent </span><span class="cov0" title="0">{
+                        // TODO update distance
+                        // get distance from edge between u and v
+                        edge, ok := graph.FindEdge(u, v)
+                        if !ok </span><span class="cov0" title="0">{
+                                // TODO
+                                return shortestPathSet, parent, fmt.Errorf("edge not found")
+                        }</span>
+                        <span class="cov0" title="0">d := edge.Distance
+
+                        // For every adjacent vertex v, if sum of distance value of u (from source) and weight of edge u-v, is less than the distance value of v,
+                        // then update the distance value of v.
+                        // TODO
+                        v.TentativeDistance = d</span>
+                }
+
+                // Pick the vertex with minimum distance value and not already included in SPT (not in sptSET).
+                <span class="cov0" title="0">min := math.Inf(1)
+                var last *Node
+                for _, v := range adjacent </span><span class="cov0" title="0">{
+                        if v.TentativeDistance &lt; min </span><span class="cov0" title="0">{
+                                last = v
+                        }</span>
+                }
+
+                <span class="cov0" title="0">if last == nil </span><span class="cov0" title="0">{
+                        // TODO
+                        return shortestPathSet, parent, fmt.Errorf("last is nil")
+                }</span> else<span class="cov0" title="0"> {
+                        parent = append(parent, u)
+                        shortestPathSet[last.ID] = last
+
+                        // Update the distance values of adjacent vertices of last
+                        // TODO ... just continue loop
+
+                }</span>
+
+        }
+
+        <span class="cov0" title="0">return shortestPathSet, parent, nil</span>
+
+}
+
+type NodesMap map[string]*Node
+type EdgesMap map[string]*Edge
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package pathfinding
+
+import (
+        "fmt"
+        "math"
+)
+
+type Graph struct {
+        Nodes NodesMap
+        Edges EdgesMap
+}
+
+func NewGraph() *Graph <span class="cov8" title="1">{
+        return &amp;Graph{
+                Nodes: NodesMap{},
+                Edges: EdgesMap{},
+        }
+}</span>
+
+type Node struct {
+        ID                               string
+        TentativeDistance                float64
+        visited, isSource, isDestination bool
+}
+
+func (g *Graph) NewNode(id string) *Node <span class="cov8" title="1">{
+        node := &amp;Node{
+                ID:                id,
+                visited:           false,
+                TentativeDistance: math.Inf(1),
+                isSource:          false,
+                isDestination:     false,
+        }
+        g.Nodes[id] = node
+        return node
+}</span>
+
+func (g *Graph) NewSourceNode(id string) *Node <span class="cov0" title="0">{
+        node := g.NewNode(id)
+        node.isSource = true
+        return node
+}</span>
+
+func (g *Graph) NewDestinationNode(id string) *Node <span class="cov0" title="0">{
+        node := g.NewNode(id)
+        node.isDestination = true
+        return node
+}</span>
+
+type Edge struct {
+        NodeA, NodeB *Node
+        Distance     float64
+}
+
+// func (g *Graph) NewEdge(nodeA, nodeB *Node, distance float64) *Edge {
+//         return &amp;Edge{
+//                 NodeA:    nodeA,
+//                 NodeB:    nodeB,
+//                 Distance: distance,
+//         }
+// }
+
+func (e Edge) Id() string <span class="cov8" title="1">{
+        return fmt.Sprintf(
+                "%s~%s",
+                e.NodeA.ID,
+                e.NodeB.ID,
+        )
+}</span>
+
+func (g *Graph) FindNodeById(id string) *Node <span class="cov8" title="1">{
+        for nodeId, node := range g.Nodes </span><span class="cov8" title="1">{
+                if nodeId == id </span><span class="cov8" title="1">{
+                        return node
+                }</span>
+        }
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (g *Graph) AddEdge(nodeAId, nodeBId string, distance float64) <span class="cov8" title="1">{
+        var nodeA *Node
+        var nodeB *Node
+
+        nodeA = g.FindNodeById(nodeAId)
+        if nodeA == nil </span><span class="cov8" title="1">{
+                nodeA = g.NewNode(nodeAId)
+        }</span>
+        <span class="cov8" title="1">nodeB = g.FindNodeById(nodeBId)
+        if nodeB == nil </span><span class="cov8" title="1">{
+                nodeB = g.NewNode(nodeBId)
+        }</span>
+        <span class="cov8" title="1">edge := &amp;Edge{
+                NodeA:    nodeA,
+                NodeB:    nodeB,
+                Distance: distance,
+        }
+        _, ok := g.Edges[edge.Id()]
+        if !ok </span><span class="cov8" title="1">{
+                g.Edges[edge.Id()] = edge
+        }</span>
+}
+
+func (g *Graph) FindEdge(u, v *Node) (*Edge, bool) <span class="cov8" title="1">{
+        for _, edge := range g.Edges </span><span class="cov8" title="1">{
+                if (edge.NodeA.ID == u.ID &amp;&amp; edge.NodeB.ID == v.ID) ||
+                        (edge.NodeA.ID == v.ID &amp;&amp; edge.NodeB.ID == u.ID) </span><span class="cov8" title="1">{
+                        return edge, true
+                }</span>
+        }
+        <span class="cov8" title="1">return nil, false</span>
+}
+
+func (g *Graph) FindEdgesForNode(node *Node) EdgesMap <span class="cov8" title="1">{
+        edgesMap := EdgesMap{}
+
+        for edgeId, edge := range g.Edges </span><span class="cov8" title="1">{
+                if edge.NodeA.ID == node.ID || edge.NodeB.ID == node.ID </span><span class="cov8" title="1">{
+                        edgesMap[edgeId] = edge
+                }</span>
+        }
+
+        <span class="cov8" title="1">return edgesMap</span>
+}
+
+func (g *Graph) FindEdgesForNodes(nodesMap NodesMap) EdgesMap <span class="cov0" title="0">{
+        edgesMap := EdgesMap{}
+
+        for _, node := range nodesMap </span><span class="cov0" title="0">{
+                edges := g.FindEdgesForNode(node)
+                for edgeId, edge := range edges </span><span class="cov0" title="0">{
+                        _, ok := edgesMap[edgeId]
+                        if !ok </span><span class="cov0" title="0">{
+                                edgesMap[edgeId] = edge
+                        }</span>
+                }
+        }
+
+        <span class="cov0" title="0">return edgesMap</span>
+}
+
+func (g *Graph) GraphVizString() string <span class="cov0" title="0">{
+        gvStr := "graph shortestPath {\n"
+        for _, edge := range g.Edges </span><span class="cov0" title="0">{
+                gvStr = fmt.Sprintf("%s  %s -- %s [label=%.2f]\n", gvStr, edge.NodeA.ID, edge.NodeB.ID, edge.Distance)
+        }</span>
+
+        <span class="cov0" title="0">for _, node := range g.Nodes </span><span class="cov0" title="0">{
+                if node.isSource </span><span class="cov0" title="0">{
+                        gvStr = fmt.Sprintf("%s  %s [shape=diamond];\n", gvStr, node.ID)
+                }</span> else<span class="cov0" title="0"> if node.isDestination </span><span class="cov0" title="0">{
+                        gvStr = fmt.Sprintf("%s  %s [shape=square];\n", gvStr, node.ID)
+                }</span>
+        }
+
+        <span class="cov0" title="0">gvStr = fmt.Sprintf("%s}", gvStr)
+        return gvStr</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

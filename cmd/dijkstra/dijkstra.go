@@ -9,46 +9,24 @@ import (
 
 func main() {
 
-	nodeA := pathfinding.NewSourceNode("a")
-	nodeB := pathfinding.NewNode("b")
-	nodeC := pathfinding.NewNode("c")
-	nodeD := pathfinding.NewNode("d")
-	nodeE := pathfinding.NewNode("e")
-	nodeF := pathfinding.NewDestinationNode("f")
-	//  A
-	//  | \
-	//  |  \
-	//  |   \
-	//  |    \
-	//  1     2
-	//  |     |
-	// [B]   [C]
-	//  |     |
-	//  2     3
-	//  |     |
-	// [D]   [E]
-	//  |     |
-	//  6     5
-	//  |    /
-	//  |   /
-	//  |  /
-	//  | /
-	// [F]
-
-	// shortest path is A > B > D > F (distance=9)
-	// longest path is A > C > E > F (distance=10)
-
 	graph := pathfinding.NewGraph()
 
-	// nodeX := pathfinding.NewNode("x")
-	// graph.AddNode(nodeX)
+	graph.AddEdge("0", "1", 4)
+	graph.AddEdge("1", "2", 8)
+	// graph.AddEdge("2", "3", 7)
+	// graph.AddEdge("3", "4", 9)
+	// graph.AddEdge("4", "5", 10)
+	// graph.AddEdge("5", "6", 2)
+	// graph.AddEdge("6", "7", 1)
+	// graph.AddEdge("7", "8", 7)
 
-	graph.AddEdge(nodeA, nodeB, 1)
-	graph.AddEdge(nodeA, nodeC, 2)
-	graph.AddEdge(nodeB, nodeD, 2)
-	graph.AddEdge(nodeC, nodeE, 3)
-	graph.AddEdge(nodeD, nodeF, 6)
-	graph.AddEdge(nodeE, nodeF, 5)
+	// graph.AddEdge("0", "7", 8)
+	// graph.AddEdge("1", "7", 11)
+	// graph.AddEdge("7", "8", 7)
+	// graph.AddEdge("6", "8", 6)
+	// graph.AddEdge("2", "8", 2)
+	// graph.AddEdge("2", "5", 4)
+	// graph.AddEdge("3", "5", 14)
 
 	shortestPathTree, shortestPath, err := pathfinding.Dijkstra(graph)
 	if err != nil {
