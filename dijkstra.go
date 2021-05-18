@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-func Dijkstra(graph *Graph) (shortestPathSet NodesMap, parent []*Node, err error) {
+func Dijkstra(graph *Graph) (shortestPathSet NodesMap, shortestPath []*Node, err error) {
 
 	// 1) Create a set sptSet (shortest path tree set) that keeps track of vertices included in shortest path tree, i.e.,
 	// whose minimum distance from source is calculated and finalized. Initially, this set is empty.
@@ -51,9 +51,16 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, parent []*Node, err error
 		return adjacent
 	}
 
-	parent = []*Node{}
+	findShortestPath := false
+	shortestPath = []*Node{}
 
-	// u := graph.FindSourceNode()
+	sources := graph.FindSourceNodes()
+
+	if len(sources) == 1 {
+		findShortestPath = true
+	} else if len(sources) > 1 {
+		return NodesMap{}, shortestPath, fmt.Errorf("multiple source nodes specified, please only specify one")
+	}
 
 	// While the shortest path set does not contain all nodes
 	for len(shortestPathSet) != len(graph.Nodes) {
@@ -61,7 +68,7 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, parent []*Node, err error
 		u := findNodeNotInShortestPathSet(shortestPathSet, graph.Nodes)
 		if u == nil {
 			// TODO
-			return shortestPathSet, parent, fmt.Errorf("node not found")
+			return shortestPathSet, shortestPath, fmt.Errorf("node not found")
 		}
 		// Include u to sptSet.
 		shortestPathSet[u.ID] = u
@@ -74,7 +81,7 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, parent []*Node, err error
 			edge, ok := graph.FindEdge(u, v)
 			if !ok {
 				// TODO
-				return shortestPathSet, parent, fmt.Errorf("edge not found")
+				return shortestPathSet, shortestPath, fmt.Errorf("edge not found")
 			}
 			d := edge.Distance
 
@@ -95,9 +102,11 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, parent []*Node, err error
 
 		if last == nil {
 			// TODO
-			return shortestPathSet, parent, fmt.Errorf("last is nil")
+			return shortestPathSet, shortestPath, fmt.Errorf("last is nil")
 		} else {
-			parent = append(parent, u)
+			if findShortestPath {
+				shortestPath = append(shortestPath, u)
+			}
 			shortestPathSet[last.ID] = last
 
 			// Update the distance values of adjacent vertices of last
@@ -107,7 +116,7 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, parent []*Node, err error
 
 	}
 
-	return shortestPathSet, parent, nil
+	return shortestPathSet, shortestPath, nil
 
 }
 
