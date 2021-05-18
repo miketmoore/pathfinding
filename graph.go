@@ -5,6 +5,9 @@ import (
 	"math"
 )
 
+type NodesMap map[string]*Node
+type EdgesMap map[string]*Edge
+
 type Graph struct {
 	Nodes NodesMap
 	Edges EdgesMap
