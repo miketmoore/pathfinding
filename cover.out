@@ -48,11 +48,11 @@ github.com/miketmoore/pathfinding/graph.go:113.55,116.36 2 1
 github.com/miketmoore/pathfinding/graph.go:122.2,122.17 1 1
 github.com/miketmoore/pathfinding/graph.go:116.36,117.59 1 1
 github.com/miketmoore/pathfinding/graph.go:117.59,119.4 1 1
-github.com/miketmoore/pathfinding/graph.go:125.63,128.32 2 0
-github.com/miketmoore/pathfinding/graph.go:138.2,138.17 1 0
-github.com/miketmoore/pathfinding/graph.go:128.32,130.35 2 0
-github.com/miketmoore/pathfinding/graph.go:130.35,132.11 2 0
-github.com/miketmoore/pathfinding/graph.go:132.11,134.5 1 0
+github.com/miketmoore/pathfinding/graph.go:125.63,128.32 2 1
+github.com/miketmoore/pathfinding/graph.go:138.2,138.17 1 1
+github.com/miketmoore/pathfinding/graph.go:128.32,130.35 2 1
+github.com/miketmoore/pathfinding/graph.go:130.35,132.11 2 1
+github.com/miketmoore/pathfinding/graph.go:132.11,134.5 1 1
 github.com/miketmoore/pathfinding/graph.go:141.41,143.31 2 0
 github.com/miketmoore/pathfinding/graph.go:147.2,147.31 1 0
 github.com/miketmoore/pathfinding/graph.go:155.2,156.14 2 0

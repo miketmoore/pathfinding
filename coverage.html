@@ -57,7 +57,7 @@
 				
 				<option value="file0">github.com/miketmoore/pathfinding/dijkstra.go (0.0%)</option>
 				
-				<option value="file1">github.com/miketmoore/pathfinding/graph.go (55.6%)</option>
+				<option value="file1">github.com/miketmoore/pathfinding/graph.go (70.4%)</option>
 				
 				</select>
 			</div>
@@ -310,20 +310,20 @@ func (g *Graph) FindEdgesForNode(node *Node) EdgesMap <span class="cov8" title="
         <span class="cov8" title="1">return edgesMap</span>
 }
 
-func (g *Graph) FindEdgesForNodes(nodesMap NodesMap) EdgesMap <span class="cov0" title="0">{
+func (g *Graph) FindEdgesForNodes(nodesMap NodesMap) EdgesMap <span class="cov8" title="1">{
         edgesMap := EdgesMap{}
 
-        for _, node := range nodesMap </span><span class="cov0" title="0">{
+        for _, node := range nodesMap </span><span class="cov8" title="1">{
                 edges := g.FindEdgesForNode(node)
-                for edgeId, edge := range edges </span><span class="cov0" title="0">{
+                for edgeId, edge := range edges </span><span class="cov8" title="1">{
                         _, ok := edgesMap[edgeId]
-                        if !ok </span><span class="cov0" title="0">{
+                        if !ok </span><span class="cov8" title="1">{
                                 edgesMap[edgeId] = edge
                         }</span>
                 }
         }
 
-        <span class="cov0" title="0">return edgesMap</span>
+        <span class="cov8" title="1">return edgesMap</span>
 }
 
 func (g *Graph) GraphVizString() string <span class="cov0" title="0">{

@@ -183,48 +183,56 @@ func TestFindEdgesForNodeSomeFound(t *testing.T) {
 	graph.AddEdge("a", "b", 1)
 	graph.AddEdge("a", "c", 2)
 
-	nodeA := graph.FindNodeById("a")
-	result0 := graph.FindEdgesForNode(nodeA)
-	if len(result0) != 2 {
-		t.Errorf("should have found 2 edges but found=%d", len(result0))
+	assert := func(nodeId string, expectedEdgeIds []string) {
+		input := pathfinding.NodesMap{
+			nodeId: graph.FindNodeById(nodeId),
+		}
+		got := graph.FindEdgesForNodes(input)
+		if len(got) != len(expectedEdgeIds) {
+			t.Errorf("response length is unexpected")
+		}
+		for _, edgeId := range expectedEdgeIds {
+			_, ok := got[edgeId]
+			if !ok {
+				t.Error("edge is not in results")
+			}
+		}
 	}
 
-	if result0["a~b"] == nil {
-		t.Errorf("edge not found")
-	}
-	if result0["a~c"] == nil {
-		t.Errorf("edge not found")
-	}
+	assert("a", []string{"a~b", "a~c"})
+	assert("b", []string{"a~b"})
+	assert("c", []string{"a~c"})
 
-	nodeB := graph.FindNodeById("b")
-	result1 := graph.FindEdgesForNode(nodeB)
-	if len(result1) != 1 {
-		t.Errorf("should have found 1 edges but found=%d", len(result1))
-	}
-
-	if result0["a~b"] == nil {
-		t.Errorf("edge not found")
-	}
-
-	nodeC := graph.FindNodeById("c")
-	result2 := graph.FindEdgesForNode(nodeC)
-	if len(result2) != 1 {
-		t.Errorf("should have found 1 edges but found=%d", len(result2))
-	}
 }
 
-// func TestFindEdgesForNodes(t *testing.T) {
-// 	graph := pathfinding.NewGraph()
+func TestFindEdgesForNodes(t *testing.T) {
+	graph := pathfinding.NewGraph()
 
-// 	graph.AddEdge("a", "b", 1)
-// 	graph.AddEdge("a", "c", 2)
+	graph.AddEdge("a", "b", 1)
+	graph.AddEdge("a", "c", 2)
+	graph.AddEdge("d", "e", 3)
 
-// 	nodeA := graph.FindNodeById("a")
-// 	nodeB := graph.FindNodeById("b")
-// 	nodeC := graph.FindNodeById("c")
+	assert := func(nodeIds []string, expectedEdgeIds []string) {
+		input := pathfinding.NodesMap{}
+		for _, id := range nodeIds {
+			input[id] = graph.FindNodeById(id)
+		}
+		got := graph.FindEdgesForNodes(input)
+		if len(got) != len(expectedEdgeIds) {
+			t.Errorf("response length is unexpected")
+		}
+		for _, edgeId := range expectedEdgeIds {
+			_, ok := got[edgeId]
+			if !ok {
+				t.Error("edge is not in results")
+			}
+		}
+	}
 
-// 	result0 := graph.FindEdgesForNodes(pathfinding.NodesMap{
-// 		"a": nodeA,
-// 	})
+	assert([]string{"a"}, []string{"a~b", "a~c"})
+	assert([]string{"a", "b"}, []string{"a~b", "a~c"})
+	assert([]string{"a", "b", "c"}, []string{"a~b", "a~c"})
+	assert([]string{"d"}, []string{"d~e"})
+	assert([]string{"e"}, []string{"d~e"})
 
-// }
+}
