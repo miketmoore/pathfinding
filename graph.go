@@ -52,14 +52,6 @@ type Edge struct {
 	Distance     float64
 }
 
-// func (g *Graph) NewEdge(nodeA, nodeB *Node, distance float64) *Edge {
-// 	return &Edge{
-// 		NodeA:    nodeA,
-// 		NodeB:    nodeB,
-// 		Distance: distance,
-// 	}
-// }
-
 func (e Edge) Id() string {
 	return fmt.Sprintf(
 		"%s~%s",
@@ -138,8 +130,8 @@ func (g *Graph) FindEdgesForNodes(nodesMap NodesMap) EdgesMap {
 	return edgesMap
 }
 
-func (g *Graph) GraphVizString() string {
-	gvStr := "graph shortestPath {\n"
+func (g *Graph) GraphVizString(name string) string {
+	gvStr := fmt.Sprintf("graph %s {\n", name)
 	for _, edge := range g.Edges {
 		gvStr = fmt.Sprintf("%s  %s -- %s [label=%.2f]\n", gvStr, edge.NodeA.ID, edge.NodeB.ID, edge.Distance)
 	}

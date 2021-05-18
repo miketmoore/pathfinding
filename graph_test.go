@@ -2,6 +2,7 @@ package pathfinding_test
 
 import (
 	"math"
+	"strings"
 	"testing"
 
 	"github.com/miketmoore/pathfinding"
@@ -42,44 +43,6 @@ func TestNewNode(t *testing.T) {
 		t.Errorf("node was found so ok should be true")
 	}
 }
-
-// func TestNewEdge(t *testing.T) {
-// 	graph := pathfinding.NewGraph()
-
-// 	nodeA := graph.NewNode("a")
-// 	nodeB := graph.NewNode("b")
-
-// 	edge := graph.NewEdge(nodeA, nodeB, 123)
-
-// 	if edge == nil {
-// 		t.Errorf("edge is nil but should not be")
-// 	}
-
-// 	if edge.NodeA == nil {
-// 		t.Errorf("NodeA is nil but should not be")
-// 	}
-
-// 	if edge.NodeB == nil {
-// 		t.Errorf("NodeB is nil but should not be")
-// 	}
-
-// 	if edge.Distance != 123 {
-// 		t.Errorf("edge distance is unexpected")
-// 	}
-// }
-
-// func TestEdgeId(t *testing.T) {
-// 	graph := pathfinding.NewGraph()
-
-// 	nodeA := graph.NewNode("a")
-// 	nodeB := graph.NewNode("b")
-
-// 	edge := graph.NewEdge(nodeA, nodeB, 123)
-
-// 	if edge.Id() != "a~b" {
-// 		t.Errorf("edge id is unexpected")
-// 	}
-// }
 
 func TestFindNodebyIdNoneFound(t *testing.T) {
 	graph := pathfinding.NewGraph()
@@ -235,4 +198,81 @@ func TestFindEdgesForNodes(t *testing.T) {
 	assert([]string{"d"}, []string{"d~e"})
 	assert([]string{"e"}, []string{"d~e"})
 
+}
+
+func TestGraphVizString(t *testing.T) {
+
+	tests := []struct {
+		getGraph      func() *pathfinding.Graph
+		expectedLines []string
+	}{
+		{
+			getGraph: func() *pathfinding.Graph {
+				graph := pathfinding.NewGraph()
+				graph.AddEdge("a", "b", 1)
+				graph.AddEdge("b", "c", 2)
+				return graph
+			},
+			expectedLines: []string{
+				"graph example {",
+				"  a -- b [label=1.00]",
+				"  b -- c [label=2.00]",
+				"}",
+			},
+		},
+		{
+			getGraph: func() *pathfinding.Graph {
+				graph := pathfinding.NewGraph()
+				graph.AddEdge("a", "b", 1)
+				graph.AddEdge("b", "c", 2)
+				graph.NewSourceNode("a")
+				return graph
+			},
+			expectedLines: []string{
+				"graph example {",
+				"  a -- b [label=1.00]",
+				"  b -- c [label=2.00]",
+				"  a [shape=diamond];",
+				"}",
+			},
+		},
+		{
+			getGraph: func() *pathfinding.Graph {
+				graph := pathfinding.NewGraph()
+				graph.AddEdge("a", "b", 1)
+				graph.AddEdge("b", "c", 2)
+				graph.NewSourceNode("a")
+				graph.NewDestinationNode("c")
+				return graph
+			},
+			expectedLines: []string{
+				"graph example {",
+				"  a -- b [label=1.00]",
+				"  b -- c [label=2.00]",
+				"  a [shape=diamond];",
+				"  c [shape=square];",
+				"}",
+			},
+		},
+	}
+
+	for testIndex, test := range tests {
+		got := test.getGraph().GraphVizString("example")
+		gotLines := strings.Split(got, "\n")
+		for _, expectedLine := range test.expectedLines {
+			if !ContainsInSliceString(gotLines, expectedLine) {
+				t.Errorf("testIndex=%d failed:\n---\nexpected line:\n---\n%s\n---\ngot:\n---\n%s\n---\n", testIndex, expectedLine, got)
+			}
+		}
+	}
+
+}
+
+func ContainsInSliceString(haystack []string, needle string) bool {
+	for _, possibleNeedle := range haystack {
+		if possibleNeedle == needle {
+			return true
+		}
+	}
+	return false
 }

@@ -57,7 +57,7 @@
 				
 				<option value="file0">github.com/miketmoore/pathfinding/dijkstra.go (0.0%)</option>
 				
-				<option value="file1">github.com/miketmoore/pathfinding/graph.go (70.4%)</option>
+				<option value="file1">github.com/miketmoore/pathfinding/graph.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -223,13 +223,13 @@ func (g *Graph) NewNode(id string) *Node <span class="cov8" title="1">{
         return node
 }</span>
 
-func (g *Graph) NewSourceNode(id string) *Node <span class="cov0" title="0">{
+func (g *Graph) NewSourceNode(id string) *Node <span class="cov8" title="1">{
         node := g.NewNode(id)
         node.isSource = true
         return node
 }</span>
 
-func (g *Graph) NewDestinationNode(id string) *Node <span class="cov0" title="0">{
+func (g *Graph) NewDestinationNode(id string) *Node <span class="cov8" title="1">{
         node := g.NewNode(id)
         node.isDestination = true
         return node
@@ -239,14 +239,6 @@ type Edge struct {
         NodeA, NodeB *Node
         Distance     float64
 }
-
-// func (g *Graph) NewEdge(nodeA, nodeB *Node, distance float64) *Edge {
-//         return &amp;Edge{
-//                 NodeA:    nodeA,
-//                 NodeB:    nodeB,
-//                 Distance: distance,
-//         }
-// }
 
 func (e Edge) Id() string <span class="cov8" title="1">{
         return fmt.Sprintf(
@@ -326,21 +318,21 @@ func (g *Graph) FindEdgesForNodes(nodesMap NodesMap) EdgesMap <span class="cov8"
         <span class="cov8" title="1">return edgesMap</span>
 }
 
-func (g *Graph) GraphVizString() string <span class="cov0" title="0">{
-        gvStr := "graph shortestPath {\n"
-        for _, edge := range g.Edges </span><span class="cov0" title="0">{
+func (g *Graph) GraphVizString(name string) string <span class="cov8" title="1">{
+        gvStr := fmt.Sprintf("graph %s {\n", name)
+        for _, edge := range g.Edges </span><span class="cov8" title="1">{
                 gvStr = fmt.Sprintf("%s  %s -- %s [label=%.2f]\n", gvStr, edge.NodeA.ID, edge.NodeB.ID, edge.Distance)
         }</span>
 
-        <span class="cov0" title="0">for _, node := range g.Nodes </span><span class="cov0" title="0">{
-                if node.isSource </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">for _, node := range g.Nodes </span><span class="cov8" title="1">{
+                if node.isSource </span><span class="cov8" title="1">{
                         gvStr = fmt.Sprintf("%s  %s [shape=diamond];\n", gvStr, node.ID)
-                }</span> else<span class="cov0" title="0"> if node.isDestination </span><span class="cov0" title="0">{
+                }</span> else<span class="cov8" title="1"> if node.isDestination </span><span class="cov8" title="1">{
                         gvStr = fmt.Sprintf("%s  %s [shape=square];\n", gvStr, node.ID)
                 }</span>
         }
 
-        <span class="cov0" title="0">gvStr = fmt.Sprintf("%s}", gvStr)
+        <span class="cov8" title="1">gvStr = fmt.Sprintf("%s}", gvStr)
         return gvStr</span>
 }
 </pre>
