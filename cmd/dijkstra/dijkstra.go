@@ -12,6 +12,7 @@ func main() {
 	graph := pathfinding.NewGraph()
 
 	graph.NewSourceNode("0")
+	graph.NewDestinationNode("8")
 
 	graph.AddEdge("0", "1", 4)
 	graph.AddEdge("1", "2", 8)

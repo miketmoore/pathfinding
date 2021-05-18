@@ -147,3 +147,13 @@ func (g *Graph) GraphVizString(name string) string {
 	gvStr = fmt.Sprintf("%s}", gvStr)
 	return gvStr
 }
+
+func (g *Graph) FindSourceNodes() NodesMap {
+	nodesMap := NodesMap{}
+	for _, node := range g.Nodes {
+		if node.isSource {
+			nodesMap[node.ID] = node
+		}
+	}
+	return nodesMap
+}

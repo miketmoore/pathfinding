@@ -268,6 +268,69 @@ func TestGraphVizString(t *testing.T) {
 
 }
 
+func TestFindSourceNodes(t *testing.T) {
+	tests := []struct {
+		getGraph func() *pathfinding.Graph
+		expected pathfinding.NodesMap
+	}{
+		{
+			getGraph: func() *pathfinding.Graph {
+				return pathfinding.NewGraph()
+			},
+			expected: pathfinding.NodesMap{},
+		},
+		{
+			getGraph: func() *pathfinding.Graph {
+				graph := pathfinding.NewGraph()
+				graph.AddEdge("a", "b", 1)
+				graph.AddEdge("b", "c", 1)
+				return graph
+			},
+			expected: pathfinding.NodesMap{},
+		},
+		{
+			getGraph: func() *pathfinding.Graph {
+				graph := pathfinding.NewGraph()
+				graph.NewSourceNode("a")
+				graph.AddEdge("a", "b", 23)
+				graph.AddEdge("b", "c", 10)
+				return graph
+			},
+			expected: pathfinding.NodesMap{
+				"a": &pathfinding.Node{ID: "a"},
+			},
+		},
+		{
+			getGraph: func() *pathfinding.Graph {
+				graph := pathfinding.NewGraph()
+				graph.NewSourceNode("a")
+				graph.NewSourceNode("d")
+				graph.AddEdge("a", "b", 23)
+				graph.AddEdge("b", "c", 10)
+				return graph
+			},
+			expected: pathfinding.NodesMap{
+				"a": &pathfinding.Node{ID: "a"},
+				"d": &pathfinding.Node{ID: "d"},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		got := test.getGraph().FindSourceNodes()
+
+		if len(got) != len(test.expected) {
+			t.Errorf("length is unexpected got=[%d] expected=[%d]", len(got), len(test.expected))
+		}
+
+		for key, value := range test.expected {
+			if got[key] == nil || got[key].ID != value.ID {
+				t.Error("value is unexpected")
+			}
+		}
+	}
+}
+
 func ContainsInSliceString(haystack []string, needle string) bool {
 	for _, possibleNeedle := range haystack {
 		if possibleNeedle == needle {

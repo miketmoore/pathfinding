@@ -53,6 +53,8 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, parent []*Node, err error
 
 	parent = []*Node{}
 
+	// u := graph.FindSourceNode()
+
 	// While the shortest path set does not contain all nodes
 	for len(shortestPathSet) != len(graph.Nodes) {
 		// Pick a vertex u which is not there in sptSet and has minimum distance value.
