@@ -28,29 +28,6 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, err error) {
 	// For every adjacent vertex v, if sum of distance value of u (from source) and weight of edge u-v, is less than the distance value of v,
 	// then update the distance value of v.
 
-	findNodeNotInShortestPathSet := func(shortestPathSet NodesMap, allNodes NodesMap) *Node {
-
-		for nodeId, node := range allNodes {
-			_, ok := shortestPathSet[nodeId]
-			if !ok {
-				return node
-			}
-		}
-		return nil
-	}
-
-	findAdjacentNodes := func(node *Node) []*Node {
-		adjacent := []*Node{}
-		for _, edge := range graph.Edges {
-			if node.ID == edge.NodeA.ID {
-				adjacent = append(adjacent, edge.NodeB)
-			} else if node.ID == edge.NodeB.ID {
-				adjacent = append(adjacent, edge.NodeA)
-			}
-		}
-		return adjacent
-	}
-
 	// While the shortest path set does not contain all nodes
 	for len(shortestPathSet) != len(graph.Nodes) {
 		// Pick a vertex u which is not there in sptSet and has minimum distance value.
@@ -64,7 +41,7 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, err error) {
 		shortestPathSet[u.ID] = u
 
 		// Update distance value of all adjacent vertices of u. To update the distance values, iterate through all adjacent vertices.
-		adjacent := findAdjacentNodes(u)
+		adjacent := findAdjacentNodes(graph, u)
 		for _, v := range adjacent {
 			// TODO update distance
 			// get distance from edge between u and v
@@ -105,4 +82,26 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, err error) {
 
 	return shortestPathSet, nil
 
+}
+
+func findAdjacentNodes(graph *Graph, node *Node) []*Node {
+	adjacent := []*Node{}
+	for _, edge := range graph.Edges {
+		if node.ID == edge.NodeA.ID {
+			adjacent = append(adjacent, edge.NodeB)
+		} else if node.ID == edge.NodeB.ID {
+			adjacent = append(adjacent, edge.NodeA)
+		}
+	}
+	return adjacent
+}
+
+func findNodeNotInShortestPathSet(shortestPathSet NodesMap, allNodes NodesMap) *Node {
+	for nodeId, node := range allNodes {
+		_, ok := shortestPathSet[nodeId]
+		if !ok {
+			return node
+		}
+	}
+	return nil
 }
