@@ -41,7 +41,7 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, err error) {
 		shortestPathSet[u.ID] = u
 
 		// Update distance value of all adjacent vertices of u. To update the distance values, iterate through all adjacent vertices.
-		adjacent := findAdjacentNodes(graph, u)
+		adjacent := FindAdjacentNodes(graph, u.ID)
 		for _, v := range adjacent {
 			// TODO update distance
 			// get distance from edge between u and v
@@ -84,7 +84,8 @@ func Dijkstra(graph *Graph) (shortestPathSet NodesMap, err error) {
 
 }
 
-func findAdjacentNodes(graph *Graph, node *Node) []*Node {
+func FindAdjacentNodes(graph *Graph, nodeId string) []*Node {
+	node := graph.FindNodeById(nodeId)
 	adjacent := []*Node{}
 	for _, edge := range graph.Edges {
 		if node.ID == edge.NodeA.ID {

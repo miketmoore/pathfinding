@@ -1,5 +1,75 @@
 package pathfinding_test
 
+import (
+	"testing"
+
+	"github.com/miketmoore/pathfinding"
+)
+
+func TestFindAdjacentNodes(t *testing.T) {
+
+	tests := []struct {
+		getGraph        func() *pathfinding.Graph
+		input           string
+		expectedNodeIds []string
+	}{
+		{
+			getGraph: func() *pathfinding.Graph {
+				return pathfinding.NewGraph()
+			},
+			input:           "a",
+			expectedNodeIds: []string{},
+		},
+		{
+			getGraph: func() *pathfinding.Graph {
+				graph := pathfinding.NewGraph()
+				graph.AddEdge("a", "b", 1)
+				graph.AddEdge("a", "c", 1)
+				graph.AddEdge("a", "d", 1)
+				return graph
+			},
+			input:           "a",
+			expectedNodeIds: []string{"b", "c", "d"},
+		},
+		{
+			getGraph: func() *pathfinding.Graph {
+				graph := pathfinding.NewGraph()
+				graph.AddEdge("a", "b", 1)
+				graph.AddEdge("a", "c", 1)
+				graph.AddEdge("a", "d", 1)
+				return graph
+			},
+			input:           "b",
+			expectedNodeIds: []string{"a"},
+		},
+	}
+
+	for _, test := range tests {
+		graph := test.getGraph()
+		found := pathfinding.FindAdjacentNodes(graph, test.input)
+		if len(found) != len(test.expectedNodeIds) {
+			t.Errorf("length is unexpected - got=%d expected=%d", len(found), len(test.expectedNodeIds))
+		}
+		if !ContainsInSliceNode(found, test.expectedNodeIds...) {
+			t.Error("contains unexpected values")
+		}
+	}
+
+}
+
+func ContainsInSliceNode(nodes []*pathfinding.Node, expectedNodeIds ...string) bool {
+	matches := 0
+	for _, expectedNodeId := range expectedNodeIds {
+		for _, node := range nodes {
+			if node.ID == expectedNodeId {
+				matches++
+				continue
+			}
+		}
+	}
+	return matches == len(nodes)
+}
+
 // func TestDijkstra(t *testing.T) {
 
 // 	tests := []struct {
