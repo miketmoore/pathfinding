@@ -2,7 +2,6 @@ package pathfinding
 
 import (
 	"fmt"
-	"math"
 )
 
 type NodesMap map[string]*Node
@@ -22,17 +21,15 @@ func NewGraph() *Graph {
 
 type Node struct {
 	ID                               string
-	TentativeDistance                float64
 	visited, isSource, isDestination bool
 }
 
 func (g *Graph) NewNode(id string) *Node {
 	node := &Node{
-		ID:                id,
-		visited:           false,
-		TentativeDistance: math.Inf(1),
-		isSource:          false,
-		isDestination:     false,
+		ID:            id,
+		visited:       false,
+		isSource:      false,
+		isDestination: false,
 	}
 	g.Nodes[id] = node
 	return node

@@ -59,4 +59,8 @@ func main() {
 		}
 	}
 	fmt.Println(spGraph.GraphVizString("shortestPathGraph"))
+
+	for _, edge := range graph.Edges {
+		fmt.Printf("original weight=%.2f\n", edge.Distance)
+	}
 }

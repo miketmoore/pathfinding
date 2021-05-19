@@ -1,7 +1,6 @@
 package pathfinding_test
 
 import (
-	"math"
 	"strings"
 	"testing"
 
@@ -29,10 +28,6 @@ func TestNewNode(t *testing.T) {
 
 	if node.ID != "a" {
 		t.Errorf("node ID is unexpected")
-	}
-
-	if node.TentativeDistance != math.Inf(1) {
-		t.Errorf("node TentativeDistance is unexpected")
 	}
 
 	found, ok := graph.Nodes["a"]
