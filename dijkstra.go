@@ -83,6 +83,8 @@ func dothings(
 	dothings(graph, *lastId, destinationNodeId, unvisitedNodes, tentativeNodeDistances)
 }
 
+// FindUnvisitedNeighbors returns a set of node IDs where each node is a neighbor
+// of the source node ID and none of the nodes in the set have been visisted
 func FindUnvisitedNeighbors(
 	graph *Graph,
 	sourceNodeId string,
@@ -99,6 +101,8 @@ func FindUnvisitedNeighbors(
 	return unvisitedNeighbors
 }
 
+// CalculateTentativeDistance updates the tentative node distance map for the
+// nodes u and v
 func CalculateTentativeDistance(
 	graph *Graph,
 	tentativeNodeDistances map[string]float64,
@@ -115,6 +119,10 @@ func CalculateTentativeDistance(
 	}
 }
 
+// SelectUnvisitedNodeWithSmallestTentativeDistance returns a node ID if
+// there are still unvisited nodes. The node ID returned is the one with
+// the minimum tentative distance among the remaining unvisited nodes.
+// If no node is found, a nil pointer is returned.
 func SelectUnvisitedNodeWithSmallestTentativeDistance(
 	unvisitedNodes map[string]bool,
 	tentativeNodeDistances map[string]float64,
