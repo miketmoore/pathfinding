@@ -31,36 +31,39 @@ func main() {
 	graph.AddEdge("2", "5", 4)
 	graph.AddEdge("3", "5", 14)
 
-	shortestPathTree, err := pathfinding.Dijkstra(graph)
+	shortestPathGraph, err := pathfinding.Dijkstra(graph, "0")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(0)
 	}
 
-	edges := graph.FindEdgesForNodes(shortestPathTree)
-	fmt.Println("---")
-	fmt.Println("edges:")
-	fmt.Println("---")
-	for edgeId, edge := range edges {
-		fmt.Printf("id=%s  distance=%f\n", edgeId, edge.Distance)
-	}
+	fmt.Println(shortestPathGraph.GraphVizString("shortestPath"))
 
-	fmt.Println(graph.GraphVizString("example"))
+	// edges := graph.FindEdgesForNodes(shortestPathTree)
+	// fmt.Println("---")
+	// fmt.Println("edges:")
+	// fmt.Println("---")
+	// for edgeId, edge := range edges {
+	// 	fmt.Printf("id=%s  distance=%f\n", edgeId, edge.Distance)
+	// }
 
-	// build shortest path graph
-	spGraph := pathfinding.NewGraph()
+	// fmt.Println(graph.GraphVizString("example"))
 
-	spGraph.NewSourceNode("0")
-	spGraph.NewDestinationNode("8")
-	for _, node := range shortestPathTree {
-		edgesMap := graph.FindEdgesForNode(node)
-		for _, edge := range edgesMap {
-			spGraph.AddEdge(edge.NodeA.ID, edge.NodeB.ID, edge.Distance)
-		}
-	}
-	fmt.Println(spGraph.GraphVizString("shortestPathGraph"))
+	// // build shortest path graph
+	// spGraph := pathfinding.NewGraph()
 
-	for _, edge := range graph.Edges {
-		fmt.Printf("original weight=%.2f\n", edge.Distance)
-	}
+	// spGraph.NewSourceNode("0")
+	// spGraph.NewDestinationNode("8")
+	// for _, node := range shortestPathTree {
+	// 	edgesMap := graph.FindEdgesForNode(node)
+	// 	for _, edge := range edgesMap {
+	// 		spGraph.AddEdge(edge.NodeA.ID, edge.NodeB.ID, edge.Distance)
+	// 	}
+	// }
+	// fmt.Println(spGraph.GraphVizString("shortestPathGraph"))
+
+	// for _, edge := range graph.Edges {
+	// 	fmt.Printf("original weight=%.2f\n", edge.Distance)
+	// }
+
 }
