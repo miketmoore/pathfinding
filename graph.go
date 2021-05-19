@@ -102,6 +102,16 @@ func (g *Graph) FindEdge(u, v *Node) (*Edge, bool) {
 	return nil, false
 }
 
+func (g *Graph) FindEdgeByNodeIds(u, v string) (*Edge, bool) {
+	for _, edge := range g.Edges {
+		if (edge.NodeA.ID == u && edge.NodeB.ID == v) ||
+			(edge.NodeA.ID == v && edge.NodeB.ID == u) {
+			return edge, true
+		}
+	}
+	return nil, false
+}
+
 func (g *Graph) FindEdgesForNode(node *Node) EdgesMap {
 	edgesMap := EdgesMap{}
 
