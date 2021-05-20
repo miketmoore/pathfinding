@@ -84,38 +84,54 @@ func TestFindUnvisitedNeighbors(t *testing.T) {
 }
 
 func TestDijkstraAllPaths(t *testing.T) {
-	graph := pathfinding.NewGraph()
 
-	graph.NewSourceNode("A")
-	graph.AddEdge("A", "B", 3)
-	graph.AddEdge("B", "E", 1)
-	graph.AddEdge("E", "D", 7)
-	graph.AddEdge("B", "D", 5)
-	graph.AddEdge("C", "D", 2)
-	graph.AddEdge("B", "C", 7)
-	graph.AddEdge("A", "C", 1)
+	tests := []struct {
+		getGraph              func() *pathfinding.Graph
+		expectedNodeDistances map[string]float64
+	}{
+		{
+			getGraph: func() *pathfinding.Graph {
 
-	_, nodeDistances, err := pathfinding.DijkstraAllPaths(graph, "C")
-	if err != nil {
-		fmt.Println(err)
-		t.Error("an unexpected error was returned")
+				graph := pathfinding.NewGraph()
+
+				graph.NewSourceNode("A")
+				graph.AddEdge("A", "B", 3)
+				graph.AddEdge("B", "E", 1)
+				graph.AddEdge("E", "D", 7)
+				graph.AddEdge("B", "D", 5)
+				graph.AddEdge("C", "D", 2)
+				graph.AddEdge("B", "C", 7)
+				graph.AddEdge("A", "C", 1)
+
+				return graph
+			},
+			expectedNodeDistances: map[string]float64{
+				"A": 1,
+				"B": 4,
+				"C": 0,
+				"D": 2,
+				"E": 5,
+			},
+		},
 	}
 
-	expectedNodeDistances := map[string]float64{
-		"A": 1,
-		"B": 4,
-		"C": 0,
-		"D": 2,
-		"E": 5,
-	}
+	for _, test := range tests {
 
-	for nodeId, distance := range expectedNodeDistances {
-		_, ok := nodeDistances[nodeId]
-		if !ok {
-			t.Errorf("node=%s is not in the map but should be", nodeId)
+		_, nodeDistances, err := pathfinding.DijkstraAllPaths(test.getGraph(), "C")
+		if err != nil {
+			fmt.Println(err)
+			t.Error("an unexpected error was returned")
 		}
-		if nodeDistances[nodeId] != distance {
-			t.Errorf("node=%s distance got=%f expected=%f", nodeId, nodeDistances[nodeId], distance)
+
+		for nodeId, distance := range test.expectedNodeDistances {
+			_, ok := nodeDistances[nodeId]
+			if !ok {
+				t.Errorf("node=%s is not in the map but should be", nodeId)
+			}
+			if nodeDistances[nodeId] != distance {
+				t.Errorf("node=%s distance got=%f expected=%f", nodeId, nodeDistances[nodeId], distance)
+			}
 		}
 	}
+
 }
