@@ -22,3 +22,9 @@ Find the shortest path in a graph
 ```
 go cmd/dijkstra/dijkstra.go
 ```
+
+### References
+
+* https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#Pseudocode
+* https://www.freecodecamp.org/news/dijkstras-shortest-path-algorithm-visual-introduction/
+* https://www.codingame.com/playgrounds/1608/shortest-paths-with-dijkstras-algorithm/dijkstras-algorithm
