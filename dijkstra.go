@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-func Dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string) (shortestPathGraph *Graph, err error) {
+func Dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string, stopAtDestination bool) (shortestPathGraph *Graph, err error) {
 
 	shortestPathGraph = NewGraph()
 
@@ -14,6 +14,8 @@ func Dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string) (shor
 	for _, node := range graph.Nodes {
 		unvisitedNodes[node.ID] = true
 	}
+
+	visitedEdges := map[string]*Edge{}
 
 	// 2. Assign to every node a tentative distance value: set it to zero for our initial node and to
 	// infinity for all other nodes. Set the initial node as current.
@@ -28,6 +30,11 @@ func Dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string) (shor
 	debug := func() {
 		fmt.Println("unvisited nodes", unvisitedNodes)
 		fmt.Println("tentative distances cache", tentativeNodeDistances)
+		fmt.Println("visited edges")
+		for edgeId, edge := range visitedEdges {
+			fmt.Printf("edgeId=%s\n", edgeId)
+			shortestPathGraph.AddEdge(edge.NodeA.ID, edge.NodeB.ID, edge.Distance)
+		}
 	}
 
 	currentNodeId := sourceNodeId
@@ -51,6 +58,7 @@ func Dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string) (shor
 				fmt.Printf(" neighbor id=%s found but no edge\n", neighborId)
 				// return shortestPathGraph, fmt.Errorf("neighbor id=%s found but no edge", neighborId)
 			} else {
+				visitedEdges[edge.Id()] = edge
 				fmt.Printf(" neighbor id=%s and edge found\n", neighborId)
 				d := tentativeNodeDistances[currentNodeId] + edge.Distance
 				fmt.Printf(" tentative distance from current=%s to neighbor=%s %.2f\n", currentNodeId, neighborId, d)
@@ -70,11 +78,13 @@ func Dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string) (shor
 		// or if the smallest tentative distance among the nodes in the unvisited set is infinity (when planning
 		// a complete traversal; occurs when there is no connection between the initial node and remaining
 		// unvisited nodes), then stop. The algorithm has finished.
-		_, ok := unvisitedNodes[destinationNodeId]
-		if !ok {
-			fmt.Println("the destination node has been visited, ending early")
-			debug()
-			return shortestPathGraph, nil
+		if stopAtDestination {
+			_, ok := unvisitedNodes[destinationNodeId]
+			if !ok {
+				fmt.Println("the destination node has been visited, ending early")
+				debug()
+				return shortestPathGraph, nil
+			}
 		}
 
 		smallestTentativeDistance := math.Inf(1)
