@@ -113,13 +113,13 @@ func TestCalculateTentativeDistance(t *testing.T) {
 			},
 			tentativeNodeDistances: map[string]float64{
 				"a": 10,
-				"b": 12,
+				"b": 1,
 			},
 			nodeAId: "a",
 			nodeBId: "b",
 			expectedTentativeNodeDistances: map[string]float64{
 				"a": 10,
-				"b": 12,
+				"b": 1,
 			},
 		},
 	}
@@ -131,10 +131,13 @@ func TestCalculateTentativeDistance(t *testing.T) {
 			test.nodeAId,
 			test.nodeBId,
 		)
-		for key := range test.expectedTentativeNodeDistances {
-			_, ok := test.tentativeNodeDistances[key]
+		for key, expectedValue := range test.expectedTentativeNodeDistances {
+			gotValue, ok := test.tentativeNodeDistances[key]
 			if !ok {
 				t.Errorf("tentative distance for node id=%s not found", key)
+			}
+			if expectedValue != gotValue {
+				t.Errorf("tentative distance value is unexpected got=%f expected=%f", gotValue, expectedValue)
 			}
 		}
 	}
