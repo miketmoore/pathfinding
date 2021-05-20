@@ -104,9 +104,9 @@ func TestDijkstraAllPaths(t *testing.T) {
 	expectedNodeDistances := map[string]float64{
 		"A": 1,
 		"B": 4,
-		"E": 5,
-		"D": 2,
 		"C": 0,
+		"D": 2,
+		"E": 5,
 	}
 
 	for nodeId, distance := range expectedNodeDistances {
