@@ -81,3 +81,44 @@ func TestFindUnvisitedNeighbors(t *testing.T) {
 	}
 
 }
+
+func TestCalculateTentativeDistance(t *testing.T) {
+	tests := []struct {
+		getGraph                                               func() *pathfinding.Graph
+		tentativeNodeDistances, expectedTentativeNodeDistances map[string]float64
+		nodeAId, nodeBId                                       string
+	}{
+		{
+			getGraph: func() *pathfinding.Graph {
+				graph := pathfinding.NewGraph()
+				graph.AddEdge("a", "b", 2)
+				return graph
+			},
+			tentativeNodeDistances: map[string]float64{
+				"a": 10,
+				"b": 13,
+			},
+			nodeAId: "a",
+			nodeBId: "b",
+			expectedTentativeNodeDistances: map[string]float64{
+				"b": 12,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		pathfinding.CalculateTentativeDistance(
+			test.getGraph(),
+			test.tentativeNodeDistances,
+			test.nodeAId,
+			test.nodeBId,
+		)
+		for key := range test.expectedTentativeNodeDistances {
+			_, ok := test.tentativeNodeDistances[key]
+			if !ok {
+				t.Errorf("tentative distance for node id=%s not found", key)
+			}
+		}
+	}
+
+}

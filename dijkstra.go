@@ -106,16 +106,16 @@ func FindUnvisitedNeighbors(
 func CalculateTentativeDistance(
 	graph *Graph,
 	tentativeNodeDistances map[string]float64,
-	u string,
-	v string,
+	nodeAId string,
+	nodeBId string,
 ) {
-	currNodeDist := tentativeNodeDistances[u]
-	edge, _ := graph.FindEdgeByNodeIds(u, v)
+	nodeADist := tentativeNodeDistances[nodeAId]
+	edge, _ := graph.FindEdgeByNodeIds(nodeAId, nodeBId)
 	edgeDist := edge.Distance
-	td := currNodeDist + edgeDist
-	prevDist, prevDistOk := tentativeNodeDistances[v]
+	td := nodeADist + edgeDist
+	prevDist, prevDistOk := tentativeNodeDistances[nodeBId]
 	if prevDistOk && prevDist > td {
-		tentativeNodeDistances[v] = td
+		tentativeNodeDistances[nodeBId] = td
 	}
 }
 
