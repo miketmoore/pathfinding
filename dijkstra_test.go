@@ -87,6 +87,7 @@ func TestDijkstraAllPaths(t *testing.T) {
 
 	tests := []struct {
 		getGraph              func() *pathfinding.Graph
+		sourceNodeId          string
 		expectedNodeDistances map[string]float64
 	}{
 		{
@@ -105,6 +106,7 @@ func TestDijkstraAllPaths(t *testing.T) {
 
 				return graph
 			},
+			sourceNodeId: "C",
 			expectedNodeDistances: map[string]float64{
 				"A": 1,
 				"B": 4,
@@ -113,11 +115,41 @@ func TestDijkstraAllPaths(t *testing.T) {
 				"E": 5,
 			},
 		},
+		{
+			getGraph: func() *pathfinding.Graph {
+				graph := pathfinding.NewGraph()
+
+				graph.AddEdge("0", "1", 2)
+				graph.AddEdge("1", "3", 5)
+				graph.AddEdge("3", "2", 8)
+				graph.AddEdge("0", "2", 6)
+				graph.AddEdge("3", "5", 15)
+				graph.AddEdge("5", "6", 6)
+				graph.AddEdge("5", "4", 6)
+				graph.AddEdge("3", "4", 10)
+				graph.AddEdge("4", "6", 2)
+
+				return graph
+			},
+			sourceNodeId: "0",
+			expectedNodeDistances: map[string]float64{
+				"0": 0,
+				"1": 2,
+				"2": 6,
+				"3": 7,
+				"4": 17,
+				"5": 22,
+				"6": 19,
+			},
+		},
 	}
 
 	for _, test := range tests {
 
-		_, nodeDistances, err := pathfinding.DijkstraAllPaths(test.getGraph(), "C")
+		_, nodeDistances, err := pathfinding.DijkstraAllPaths(
+			test.getGraph(),
+			test.sourceNodeId,
+		)
 		if err != nil {
 			fmt.Println(err)
 			t.Error("an unexpected error was returned")
