@@ -127,25 +127,29 @@ func SelectUnvisitedNodeWithSmallestTentativeDistance(
 	unvisitedNodes map[string]bool,
 	tentativeNodeDistances map[string]float64,
 ) (string, bool) {
-	lastId := ""
+	var lastId *string
 	lastDistance := math.Inf(1)
-	ok := false
 
 	for nodeId := range unvisitedNodes {
-		if lastId == "" {
-			lastId = nodeId
+		if lastId == nil {
+			// Need to copy string otherwise value pointed by lastId
+			// variable will change on every iteration of the loop
+			copy := nodeId
+			lastId = &copy
 			lastDistance = tentativeNodeDistances[nodeId]
-			ok = true
 		} else {
 			td, tdOk := tentativeNodeDistances[nodeId]
 			if tdOk {
 				if td < lastDistance {
 					lastDistance = td
-					lastId = nodeId
+					lastId = &nodeId
 				}
 			}
 		}
 	}
 
-	return lastId, ok
+	if lastId == nil {
+		return "", false
+	}
+	return *lastId, true
 }
