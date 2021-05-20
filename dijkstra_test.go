@@ -1,6 +1,7 @@
 package pathfinding_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/miketmoore/pathfinding"
@@ -80,4 +81,41 @@ func TestFindUnvisitedNeighbors(t *testing.T) {
 		}
 	}
 
+}
+
+func TestDijkstraAllPaths(t *testing.T) {
+	graph := pathfinding.NewGraph()
+
+	graph.NewSourceNode("A")
+	graph.AddEdge("A", "B", 3)
+	graph.AddEdge("B", "E", 1)
+	graph.AddEdge("E", "D", 7)
+	graph.AddEdge("B", "D", 5)
+	graph.AddEdge("C", "D", 2)
+	graph.AddEdge("B", "C", 7)
+	graph.AddEdge("A", "C", 1)
+
+	_, nodeDistances, err := pathfinding.DijkstraAllPaths(graph, "C")
+	if err != nil {
+		fmt.Println(err)
+		t.Error("an unexpected error was returned")
+	}
+
+	expectedNodeDistances := map[string]float64{
+		"A": 1,
+		"B": 4,
+		"E": 5,
+		"D": 2,
+		"C": 0,
+	}
+
+	for nodeId, distance := range expectedNodeDistances {
+		_, ok := nodeDistances[nodeId]
+		if !ok {
+			t.Errorf("node=%s is not in the map but should be", nodeId)
+		}
+		if nodeDistances[nodeId] != distance {
+			t.Errorf("node=%s distance got=%f expected=%f", nodeId, nodeDistances[nodeId], distance)
+		}
+	}
 }
