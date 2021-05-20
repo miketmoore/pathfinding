@@ -73,14 +73,14 @@ func dothings(
 
 	// Otherwise, select the unvisited node that is marked with the smallest tentative distance, set it as
 	// the new "current node", and go back to step 3.
-	lastId := SelectUnvisitedNodeWithSmallestTentativeDistance(unvisitedNodes, tentativeNodeDistances)
+	lastId, lastIdOk := SelectUnvisitedNodeWithSmallestTentativeDistance(unvisitedNodes, tentativeNodeDistances)
 
-	if lastId == nil {
-		fmt.Println("lastId is nil")
+	if !lastIdOk {
+		fmt.Println("lastId not found")
 		return
 	}
 
-	dothings(graph, *lastId, destinationNodeId, unvisitedNodes, tentativeNodeDistances)
+	dothings(graph, lastId, destinationNodeId, unvisitedNodes, tentativeNodeDistances)
 }
 
 // FindUnvisitedNeighbors returns a set of node IDs where each node is a neighbor
@@ -126,17 +126,26 @@ func CalculateTentativeDistance(
 func SelectUnvisitedNodeWithSmallestTentativeDistance(
 	unvisitedNodes map[string]bool,
 	tentativeNodeDistances map[string]float64,
-) *string {
-	var lastId *string
-	var lastTentativeDistance float64
+) (string, bool) {
+	lastId := ""
+	lastDistance := math.Inf(1)
+	ok := false
+
 	for nodeId := range unvisitedNodes {
-		if lastId == nil {
-			lastId = &nodeId
-			lastTentativeDistance = tentativeNodeDistances[nodeId]
-		} else if tentativeNodeDistances[nodeId] < lastTentativeDistance {
-			lastId = &nodeId
-			lastTentativeDistance = tentativeNodeDistances[nodeId]
+		if lastId == "" {
+			lastId = nodeId
+			lastDistance = tentativeNodeDistances[nodeId]
+			ok = true
+		} else {
+			td, tdOk := tentativeNodeDistances[nodeId]
+			if tdOk {
+				if td < lastDistance {
+					lastDistance = td
+					lastId = nodeId
+				}
+			}
 		}
 	}
-	return lastId
+
+	return lastId, ok
 }

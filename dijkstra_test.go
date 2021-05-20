@@ -143,3 +143,56 @@ func TestCalculateTentativeDistance(t *testing.T) {
 	}
 
 }
+
+func TestSelectUnvisitedNodeWithSmallestTentativeDistance(t *testing.T) {
+	tests := []struct {
+		unvisitedNodes         map[string]bool
+		tentativeNodeDistances map[string]float64
+		expectedNodeId         string
+		expectedFlagValue      bool
+	}{
+		{
+			unvisitedNodes:         map[string]bool{},
+			tentativeNodeDistances: map[string]float64{},
+			expectedNodeId:         "",
+			expectedFlagValue:      false,
+		},
+		{
+			unvisitedNodes: map[string]bool{
+				"a": true,
+			},
+			tentativeNodeDistances: map[string]float64{
+				"a": 1,
+			},
+			expectedNodeId:    "a",
+			expectedFlagValue: true,
+		},
+		{
+			unvisitedNodes: map[string]bool{
+				"a": true,
+				"b": true,
+			},
+			tentativeNodeDistances: map[string]float64{
+				"a": 1,
+				"b": 2,
+			},
+			expectedNodeId:    "a",
+			expectedFlagValue: true,
+		},
+	}
+
+	for _, test := range tests {
+		gotNodeId, gotOk := pathfinding.SelectUnvisitedNodeWithSmallestTentativeDistance(
+			test.unvisitedNodes,
+			test.tentativeNodeDistances,
+		)
+
+		if gotNodeId != test.expectedNodeId {
+			t.Errorf("node ID is unexpected got=%s expected=%s", gotNodeId, test.expectedNodeId)
+		}
+
+		if gotOk != test.expectedFlagValue {
+			t.Errorf("ok flag is unexpected got=%t expected=%t", gotOk, test.expectedFlagValue)
+		}
+	}
+}
