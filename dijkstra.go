@@ -5,15 +5,29 @@ import (
 	"math"
 )
 
-func DijkstraAllPaths(graph *Graph, sourceNodeId string) (shortestPathGraph *Graph, err error) {
+// DijkstraAllPaths finds the shortest path from the source node to all other nodes
+func DijkstraAllPaths(
+	graph *Graph,
+	sourceNodeId string,
+) (shortestPathGraph *Graph, nodeDistances map[string]float64, err error) {
 	return dijkstra(graph, sourceNodeId, "", false)
 }
 
-func DijkstraDestination(graph *Graph, sourceNodeId, destinationNodeId string) (shortestPathGraph *Graph, err error) {
+// DijkstraDestination finds the shortest path from the source to the destination node
+func DijkstraDestination(
+	graph *Graph,
+	sourceNodeId,
+	destinationNodeId string,
+) (shortestPathGraph *Graph, nodeDistances map[string]float64, err error) {
 	return dijkstra(graph, sourceNodeId, destinationNodeId, true)
 }
 
-func dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string, stopAtDestination bool) (shortestPathGraph *Graph, err error) {
+func dijkstra(
+	graph *Graph,
+	sourceNodeId string,
+	destinationNodeId string,
+	stopAtDestination bool,
+) (shortestPathGraph *Graph, nodeDistances map[string]float64, err error) {
 
 	shortestPathGraph = NewGraph()
 
@@ -91,7 +105,7 @@ func dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string, stopA
 			if !ok {
 				fmt.Println("the destination node has been visited, ending early")
 				debug()
-				return shortestPathGraph, nil
+				return shortestPathGraph, tentativeNodeDistances, nil
 			}
 		}
 
@@ -107,7 +121,7 @@ func dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string, stopA
 		if smallestTentativeDistance == math.Inf(1) {
 			fmt.Println("the smallest tentative distance in the unvisited set is infinity, ending early")
 			debug()
-			return shortestPathGraph, nil
+			return shortestPathGraph, tentativeNodeDistances, nil
 		}
 
 		// 6. Otherwise, select the unvisited node that is marked with the smallest tentative distance, set it
@@ -117,7 +131,7 @@ func dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string, stopA
 
 	debug()
 
-	return shortestPathGraph, nil
+	return shortestPathGraph, tentativeNodeDistances, nil
 
 }
 
