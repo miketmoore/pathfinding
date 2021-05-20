@@ -105,6 +105,23 @@ func TestCalculateTentativeDistance(t *testing.T) {
 				"b": 12,
 			},
 		},
+		{
+			getGraph: func() *pathfinding.Graph {
+				graph := pathfinding.NewGraph()
+				graph.AddEdge("a", "b", 2)
+				return graph
+			},
+			tentativeNodeDistances: map[string]float64{
+				"a": 10,
+				"b": 12,
+			},
+			nodeAId: "a",
+			nodeBId: "b",
+			expectedTentativeNodeDistances: map[string]float64{
+				"a": 10,
+				"b": 12,
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -114,11 +131,6 @@ func TestCalculateTentativeDistance(t *testing.T) {
 			test.nodeAId,
 			test.nodeBId,
 		)
-		expectedLength := len(test.expectedTentativeNodeDistances)
-		gotLength := len(test.tentativeNodeDistances)
-		if expectedLength != gotLength {
-			t.Errorf("length is unexpected got=%d expected=%d", gotLength, expectedLength)
-		}
 		for key := range test.expectedTentativeNodeDistances {
 			_, ok := test.tentativeNodeDistances[key]
 			if !ok {
