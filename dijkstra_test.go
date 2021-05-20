@@ -101,6 +101,7 @@ func TestCalculateTentativeDistance(t *testing.T) {
 			nodeAId: "a",
 			nodeBId: "b",
 			expectedTentativeNodeDistances: map[string]float64{
+				"a": 10,
 				"b": 12,
 			},
 		},
@@ -113,6 +114,11 @@ func TestCalculateTentativeDistance(t *testing.T) {
 			test.nodeAId,
 			test.nodeBId,
 		)
+		expectedLength := len(test.expectedTentativeNodeDistances)
+		gotLength := len(test.tentativeNodeDistances)
+		if expectedLength != gotLength {
+			t.Errorf("length is unexpected got=%d expected=%d", gotLength, expectedLength)
+		}
 		for key := range test.expectedTentativeNodeDistances {
 			_, ok := test.tentativeNodeDistances[key]
 			if !ok {
