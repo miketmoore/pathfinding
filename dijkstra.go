@@ -5,7 +5,15 @@ import (
 	"math"
 )
 
-func Dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string, stopAtDestination bool) (shortestPathGraph *Graph, err error) {
+func DijkstraAllPaths(graph *Graph, sourceNodeId string) (shortestPathGraph *Graph, err error) {
+	return dijkstra(graph, sourceNodeId, "", false)
+}
+
+func DijkstraDestination(graph *Graph, sourceNodeId, destinationNodeId string) (shortestPathGraph *Graph, err error) {
+	return dijkstra(graph, sourceNodeId, destinationNodeId, true)
+}
+
+func dijkstra(graph *Graph, sourceNodeId string, destinationNodeId string, stopAtDestination bool) (shortestPathGraph *Graph, err error) {
 
 	shortestPathGraph = NewGraph()
 

@@ -41,7 +41,7 @@ func main() {
 	// graph.AddEdge("2", "5", 4)
 	// graph.AddEdge("3", "5", 14)
 
-	shortestPathGraph, err := pathfinding.Dijkstra(graph, "C", "", false)
+	shortestPathGraph, err := pathfinding.DijkstraAllPaths(graph, "C")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(0)
